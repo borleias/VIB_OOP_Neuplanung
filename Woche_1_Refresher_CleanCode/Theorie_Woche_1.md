@@ -34,25 +34,47 @@ public class Buerger
 
 ## 2. Clean Code Prinzipien
 
+## Warum Clean Code?
+- Code wird öfter gelesen als geschrieben.
+- "The only way to go fast, is to go well." (Robert C. Martin)
+- Reduktion technischer Schulden.
+
 ### Aussagekräftige Namen
 Vermeiden Sie Abkürzungen wie `a` oder `temp`. Nutzen Sie Fachbegriffe aus der Domäne (Verwaltung).
 
-*   **Schlecht:** `var d = DateTime.Now;`
-*   **Gut:** `var antragsEingangsDatum = DateTime.Now;`
+- **Variablen:** `int d;` (Schlecht) vs. `int antragsEingangsDatum;` (Gut).
+- **Methoden:** `void DoIt();` (Schlecht) vs. `void SaveApplicationToDatabase();` (Gut).
+- **Klassen:** Nomen verwenden, keine Verben. `AccountProcessor` statt `ProcessAccount`.
 
-### Single Responsibility (auf Methodenebene)
+## 3. Funktionen (Methoden)
+- **Kurz halten:** Eine Methode sollte idealerweise nicht mehr als 5-10 Zeilen haben.
+- **Eines tun (Do One Thing):** Eine Methode sollte eine einzige, klar definierte Aufgabe erfüllen.
+- **Keine Seiteneffekte:** Eine Methode `CheckPassword` sollte nicht gleichzeitig das Passwort in der Datenbank ändern.
+
+## 4. Single Responsibility (auf Methodenebene)
 Eine Methode sollte genau eine Sache tun. Wenn eine Methode `SpeichereUndSendeEmail` heißt, tut sie bereits zu viel.
 
-### DRY - Don't Repeat Yourself
+## 5. DRY - Don't Repeat Yourself
 Wiederholen Sie keine Logik. Wenn Sie die Berechnung einer Gebühr an drei Stellen im Code haben, extrahieren Sie diese in eine eigene Methode.
 
-### Magic Numbers und Strings vermeiden
+## 6. Magic Numbers und Strings vermeiden
 Nutzen Sie Konstanten oder Enums statt "magischer" Werte.
 
 *   **Schlecht:** `if (status == 1) { ... } // Was bedeutet 1?`
 *   **Gut:** `if (status == AntragsStatus.Eingegangen) { ... }`
 
-## 3. Refactoring: Von Dirty zu Clean
+## 7. Kommentare
+- **Guter Code erklärt sich selbst:** Kommentare sollten nur dort eingesetzt werden, wo die Absicht des Codes nicht offensichtlich ist (z.B. komplexe Algorithmen oder externe API-Besonderheiten).
+- **Vermeiden:** Offensichtliche Kommentare wie `i++; // Erhöhe i um 1`.
+- **Vermeiden:** Auskommentierter Code. (Nutze Git!)
+
+## 8. Formatierung
+- Konsistente Einrückung.
+- Zusammengehörige Codeabschnitte optisch gruppieren.
+- Befolgung der C# Coding Conventions (Microsoft).
+
+
+## 9. Refactoring: Von Dirty zu Clean
 
 Refactoring ist der Prozess, die Struktur von Code zu verbessern, ohne sein äußeres Verhalten zu ändern. 
 
