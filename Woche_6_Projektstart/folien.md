@@ -26,7 +26,10 @@ Diese Abfragen über das Netzwerk oder die Festplatte benötigen Zeit. Manchmal 
 ## Das Problem der Synchronität
 Wenn wir traditionell (synchron) programmieren, blockiert der aktuelle Thread unseres Programms, bis die externe Antwort da ist.
 In einer Desktop-Anwendung führt das dazu, dass die Oberfläche "einfriert" (Keine Rückmeldung).
-In einer Web-Anwendung blockieren wir den Webserver für andere Bürger, weil unser Server däumchendrehend auf die Datenbank wartet.
+In einer Web-Anwendung blockieren wir den Webserver für andere Bürger.
+
+## Die Lösung: Asynchrone Ausführung
+Asynchronität bedeutet: Das Programm schickt die Anfrage an das Netzwerk ab und sagt dem Thread: "Du bist frei, mach in der Zwischenzeit andere Arbeit. Sag mir Bescheid, wenn die Daten da sind, dann rechne ich hier weiter."
 
 # Teil 2: Asynchrone Programmierung (Async / Await)
 
