@@ -1,74 +1,292 @@
 ---
 title: "Objektorientierte Programmierung (Vertiefung)"
-subtitle: "Woche 3: Design Patterns II – Verhaltensmuster"
+subtitle: "Woche 3: Design Patterns II – Verhalten und Interaktion"
 author: "Dr. Peter Bernhardt"
 date: "März 2026"
 section-titles: true
 ---
 
-# Teil 1: Verhaltensmuster in der Verwaltung
+# Teil 1: Einführung in Verhaltensmuster
 
-## Fokus: Interaktion zwischen Objekten
-Nachdem wir in der letzten Woche gelernt haben, wie man Objekte erstellt (Creational Patterns) und strukturiert (Structural Patterns), betrachten wir heute die Dynamik.
+## Willkommen zu Woche 3
+In der letzten Woche haben wir gelernt, wie man Objekte sauber erzeugt (Factory) und strukturiert (Adapter). 
+Heute widmen wir uns der dritten und oft wichtigsten Kategorie von Design Patterns: den **Verhaltensmustern (Behavioral Patterns)**.
 
-Verhaltensmuster (Behavioral Patterns) konzentrieren sich auf:
-- Den Informationsfluss zwischen Objekten.
-- Die Verteilung von Verantwortlichkeiten.
-- Die Flexibilität von Algorithmen zur Laufzeit.
+**Lernziele:**
+- Strategy-Pattern für flexible Algorithmen anwenden.
+- Observer-Pattern für ereignisgesteuerte Systeme nutzen.
+- State-Pattern zur Abbildung komplexer Workflows implementieren.
 
-In der Verwaltungsinformatik ist dies besonders wichtig, da Prozesse (Workflows) und Regeln (Gesetze) sich häufig ändern, die Grundstruktur der Anwendung aber stabil bleiben soll.
+## Was sind Verhaltensmuster?
+Während Strukturmuster beschreiben, *wie* Objekte zusammengebaut werden, definieren Verhaltensmuster, *wie Objekte miteinander kommunizieren* und wie Aufgaben zwischen ihnen verteilt werden.
+Sie helfen uns, komplexe Kontrollflüsse übersichtlich und entkoppelt zu gestalten.
 
-# Teil 2: Strategy Pattern (Strategie)
+## Bedeutung für die öffentliche Verwaltung
+Verwaltungsprozesse sind hochgradig regelbasiert und zustandsbehaftet.
+- **Regeln ändern sich:** Gebührensatzungen oder Gesetze werden modifiziert.
+- **Ereignisse passieren:** Ein Antragsteller muss benachrichtigt werden, wenn ein Dokument fehlt.
+- **Zustände wechseln:** Ein Bauantrag durchläuft Stufen von "Eingereicht" bis "Genehmigt".
+Für all diese Szenarien bieten Verhaltensmuster die perfekte Blaupause.
 
-## Problem: Die "If-Else"-Hölle
-Stellen Sie sich eine Methode zur Gebührenberechnung vor, die alle kommunalen Satzungen Deutschlands enthalten muss. Der Code wäre unlesbar und müsste bei jeder kleinen Gesetzesänderung in einer einzigen, riesigen Datei angepasst werden.
+# Teil 2: Das Strategy Pattern
 
-**Die Lösung:** Das Strategy Pattern.
-Wir definieren ein Interface `IGebuehrenSatzung`. Jede konkrete Satzung (z.B. `SatzungBuxtehude`) kommt in eine eigene Klasse.
+## Einführung: Strategy Pattern
+Das Strategy-Pattern definiert eine Familie von Algorithmen, kapselt jeden einzelnen in einer eigenen Klasse und macht sie untereinander austauschbar. 
+Dadurch kann der Algorithmus unabhängig vom Klienten, der ihn nutzt, verändert werden.
 
-## Vorteile des Strategie-Musters
-- **Open-Closed Prinzip:** Wir können neue Berechnungsregeln hinzufügen, ohne bestehenden Code zu ändern.
-- **Laufzeit-Flexibilität:** Das Programm kann während der Ausführung entscheiden, welche Strategie genutzt wird (z.B. basierend auf der Postleitzahl des Bürgers).
-- **Testbarkeit:** Jede Satzung kann isoliert und einfach getestet werden, ohne den Rest des Systems zu beeinflussen.
+## Das Problem: Endlose If-Else-Ketten
+Haben Sie schon einmal Code gesehen, der so aussieht?
+```csharp
+if (stadt == "Berlin") { berechneBerlinGebuehr(); }
+else if (stadt == "Muenchen") { berechneMuenchenGebuehr(); }
+else if (stadt == "Hamburg") { ... }
+```
+Dieser Code verstößt gegen das Open-Closed-Prinzip. Bei jeder neuen Stadt muss die zentrale Berechnungs-Klasse modifiziert werden.
 
-# Teil 3: Observer Pattern (Beobachter)
+## Anwendung: Flexible Gebührenberechnung
+Stellen Sie sich ein landesweites System zur Berechnung von Hundesteuern vor. Jede Kommune hat ihre eigene Berechnungslogik (Satzung).
+Wir lagern diese spezifische Logik in einzelne Strategie-Klassen aus.
 
-## Problem: Polling vermeiden
-Wie erfährt ein Modul, dass in einem anderen Modul etwas passiert ist?
-- **Schlecht:** Modul B fragt jede Sekunde bei Modul A nach: "Bist du fertig?" (Polling).
-- **Gut:** Modul A informiert alle Interessenten aktiv, sobald ein Ereignis eintritt.
+## Strategy: Das Interface (Code)
+Wir definieren einen gemeinsamen "Vertrag" für alle Satzungen.
 
-Dies ist das Prinzip von "Publish-Subscribe".
+```csharp
+// Das Interface für alle Strategien
+public interface IGebuehrenStrategie
+{
+    double Berechne(double basisBetrag);
+}
+```
+Egal wie komplex die interne Berechnung einer Stadt ist, nach außen gibt sie nur das End-Ergebnis zurück.
 
-## Anwendung: Das Bürgerportal
-Ein Antrag durchläuft das Fachverfahren. Sobald der Status auf "Bescheid versendet" springt:
-1. Das **Portal** zeigt den neuen Status an.
-2. Der **Benachrichtigungsdienst** sendet eine SMS/E-Mail.
-3. Das **Monitoring-System** aktualisiert die Bearbeitungsstatistik.
+## Strategy: Konkrete Strategien (Code)
+Jede Kommune bekommt ihre eigene Klasse.
 
-Alle diese Dienste sind "Beobachter", die sich beim "Subjekt" (dem Antrag) angemeldet haben. Sie sind lose gekoppelt: Der Antrag muss nicht wissen, *wer* ihn beobachtet, sondern nur *dass* er seine Beobachter informieren muss.
+```csharp
+// Konkrete Strategien (Satzungen)
+public class SatzungBerlin : IGebuehrenStrategie
+{
+    public double Berechne(double basis) 
+        => basis * 1.05; // 5% Verwaltungskostenzuschlag
+}
 
-# Teil 4: State Pattern (Zustand)
+public class SatzungMuenchen : IGebuehrenStrategie
+{
+    public double Berechne(double basis) 
+        => basis + 15.00; // Pauschalgebühr
+}
+```
 
-## Problem: Komplexe Workflows
-Ein Bauantrag hat viele Zustände: `Eingereicht`, `InPruefung`, `Nachforderung`, `Genehmigt`, `Abgelehnt`. Bestimmte Aktionen sind nur in bestimmten Zuständen erlaubt.
+## Strategy: Der Kontext (Code)
+Die Kern-Anwendung (`GebuehrenRechner`) kennt die genauen Formeln gar nicht.
 
-Statt hunderter If-Abfragen wie `if (status == Status.InPruefung && aktion == Aktion.Genehmigen)`...
+```csharp
+// Der Kontext
+public class GebuehrenRechner
+{
+    private IGebuehrenStrategie _strategie;
 
-**Die Lösung:** Jeder Zustand ist eine eigene Klasse. Das Verhalten der Methode `Genehmigen()` ändert sich automatisch, je nachdem, welches Zustand-Objekt gerade aktiv ist.
+    // Strategie kann zur Laufzeit getauscht werden
+    public void SetStrategie(IGebuehrenStrategie strategie) 
+        => _strategie = strategie;
 
-## Zustandsübergänge steuern
-Das State Pattern kapselt die Logik für Übergänge. Wenn im Zustand `Eingereicht` die Methode `Pruefen()` aufgerufen wird, wechselt das Objekt intern in den Zustand `InPruefung`.
+    public double BerechneEndbetrag(double basis)
+    {
+        if (_strategie == null) 
+            throw new InvalidOperationException("Keine Satzung!");
+            
+        return _strategie.Berechne(basis);
+    }
+}
+```
 
-Dies macht den Workflow-Code:
-- **Übersichtlich:** Logik für "Nachforderung" steht nur in der Klasse `NachforderungStatus`.
-- **Sicher:** Es können keine ungültigen Übergänge (z.B. von `Eingereicht` direkt zu `Genehmigt`) programmiert werden, da die Klassen dies verhindern.
+## Vorteile des Strategy Patterns
+- **Extreme Flexibilität:** Sie können zur Laufzeit (z.B. basierend auf einer Benutzereingabe) das Verhalten des Programms ändern.
+- **Open-Closed Principle:** Um Leipzig hinzuzufügen, schreiben Sie einfach die Klasse `SatzungLeipzig`. Der Code im `GebuehrenRechner` bleibt unangetastet.
+- **Testbarkeit:** Jede Satzung kann unabhängig als kleiner Unit-Test geprüft werden.
 
-# Zusammenfassung
+# Teil 3: Das Observer Pattern
 
-## Key Takeaways
-- **Strategy:** Tauscht Algorithmen aus (z.B. Satzungen).
-- **Observer:** Reagiert auf Ereignisse (z.B. Statusänderungen).
-- **State:** Verwaltet komplexe Prozessabläufe (z.B. Antrags-Workflows).
+## Einführung: Observer Pattern
+Das Observer-Pattern (Beobachter-Muster) definiert eine 1:n-Abhängigkeit zwischen Objekten.
+Wenn sich der Zustand des "Subjekts" ändert, werden alle abhängigen "Beobachter" automatisch benachrichtigt.
 
-Diese Muster sind das Rückgrat moderner Business-Software. Sie ermöglichen es uns, Software zu bauen, die "atmen" kann – also flexibel genug ist, um mit den sich ständig ändernden Anforderungen der Verwaltung Schritt zu halten.
+## Das Problem: Polling vs. Push
+- **Polling (Schlecht):** "Ist der Antrag fertig? Nein. Ist er jetzt fertig? Nein." (Belastet das System).
+- **Push / Observer (Gut):** "Sag mir Bescheid, sobald der Antrag fertig ist. Ich lege mich solange schlafen."
+Das Observer-Pattern ermöglicht ereignisgesteuerte (event-driven) Architekturen.
+
+## Anwendung: Statusänderungen im Bürgerportal
+Wenn ein Sachbearbeiter einen Antrag auf "Genehmigt" setzt, müssen mehrere unabhängige Systeme reagieren:
+1. Das Bürger-Dashboard im Frontend.
+2. Der E-Mail-Server, der eine Bestätigung sendet.
+3. Das Archivsystem, das den Vorgang wegschreibt.
+Es wäre fatal, wenn die `Antrag`-Klasse den E-Mail-Server direkt aufrufen müsste (enge Kopplung).
+
+## Observer: Das Beobachter-Interface (Code)
+Jedes System, das über Änderungen informiert werden will, muss dieses Interface implementieren.
+
+```csharp
+// Das Interface für die Beobachter
+public interface IStatusBeobachter
+{
+    void Aktualisieren(string neuerStatus);
+}
+```
+
+## Observer: Das Subjekt / Der Antrag (Code 1)
+Der Antrag verwaltet eine Liste seiner Beobachter.
+
+```csharp
+// Das Subjekt, das beobachtet wird
+public class Antrag
+{
+    private readonly List<IStatusBeobachter> _beobachter = new List<IStatusBeobachter>();
+    public string Status { get; private set; }
+
+    public void RegistriereBeobachter(IStatusBeobachter b) 
+        => _beobachter.Add(b);
+        
+    public void EntferneBeobachter(IStatusBeobachter b) 
+        => _beobachter.Remove(b);
+// ...
+```
+
+## Observer: Benachrichtigungslogik (Code 2)
+Sobald der Zustand sich ändert, werden alle informiert.
+
+```csharp
+// ... Fortsetzung der Klasse Antrag
+    public void SetzeStatus(string neuerStatus)
+    {
+        Status = neuerStatus;
+        BenachrichtigeAlle();
+    }
+
+    private void BenachrichtigeAlle()
+    {
+        foreach (var b in _beobachter) 
+        {
+            b.Aktualisieren(Status);
+        }
+    }
+}
+```
+
+## Observer: Der konkrete Beobachter (Code)
+Der E-Mail Service registriert sich (im Setup) beim Antrag.
+
+```csharp
+// Konkreter Beobachter: E-Mail Dienst
+public class EmailService : IStatusBeobachter
+{
+    public void Aktualisieren(string neuerStatus) 
+    {
+        Console.WriteLine($"Sende E-Mail: Ihr Antrag ist nun '{neuerStatus}'.");
+        // E-Mail Sende-Logik hier...
+    }
+}
+```
+
+## Vorteile des Observer Patterns
+- **Lose Kopplung:** Der `Antrag` kennt seine Beobachter nicht im Detail, er weiß nur, dass sie das Interface implementieren.
+- Dynamik: Beobachter können zur Laufzeit hinzugefügt oder entfernt werden.
+- Anmerkung: In modernem C# wird das Observer-Pattern oft nativ durch `Events` und `Delegates` abgebildet. Das Prinzip dahinter ist jedoch identisch!
+
+# Teil 4: Das State Pattern
+
+## Einführung: State Pattern
+Das State-Pattern erlaubt es einem Objekt, sein Verhalten grundlegend zu ändern, wenn sich sein interner Zustand ändert. Es kapselt zustandsspezifisches Verhalten in eigenen Klassen.
+
+## Das Problem der Zustandsverwaltung
+Wie programmieren Sie einen Antrag, der verschiedene Phasen durchläuft? Meist endet es in unleserlichen Switch-Statements:
+```csharp
+public void Genehmigen() {
+    if (status == "Eingereicht") { throw error; }
+    else if (status == "Geprüft") { status = "Genehmigt"; }
+    else if (status == "Genehmigt") { throw error; }
+}
+```
+Das skaliert nicht bei komplexen Workflows mit vielen Regeln.
+
+## Anwendung: Bauantrags-Workflow
+Ein Bauantrag hat einen strikten Lebenszyklus:
+1. Eingegangen
+2. In Prüfung (Unterlagen können nachgefordert werden)
+3. Genehmigt / Abgelehnt
+In jedem dieser Zustände sind unterschiedliche Aktionen erlaubt oder verboten.
+
+## State: Die abstrakte Basisklasse (Code)
+Wir definieren eine Klasse, die alle möglichen Aktionen als Methoden vorgibt.
+
+```csharp
+public abstract class BauantragStatus
+{
+    // Das 'kontext' Argument erlaubt es dem Zustand, 
+    // den Status des Antrags auf den nächsten Schritt zu setzen.
+    public abstract void Bearbeiten(Bauantrag kontext);
+    public abstract void Genehmigen(Bauantrag kontext);
+}
+```
+
+## State: Ein konkreter Zustand (Code)
+Wir programmieren die Logik spezifisch für den Zustand "Eingereicht".
+
+```csharp
+// Konkreter Zustand: Eingereicht
+public class EingereichtStatus : BauantragStatus
+{
+    public override void Bearbeiten(Bauantrag kontext) 
+    {
+        Console.WriteLine("Prüfung wird gestartet...");
+        // Zustandswechsel auslösen!
+        kontext.SetzeZustand(new InPruefungStatus()); 
+    }
+    
+    public override void Genehmigen(Bauantrag kontext) 
+    {
+        Console.WriteLine("Fehler: Antrag muss erst geprüft werden!");
+    }
+}
+```
+
+## State: Die Kontext-Klasse / Der Antrag (Code)
+Der Antrag delegiert alle fachlichen Methoden einfach an sein aktuelles Status-Objekt.
+
+```csharp
+// Der Kontext
+public class Bauantrag
+{
+    private BauantragStatus _aktuellerStatus;
+
+    // Start-Zustand
+    public Bauantrag() => _aktuellerStatus = new EingereichtStatus();
+
+    public void SetzeZustand(BauantragStatus status) 
+        => _aktuellerStatus = status;
+
+    // Delegation an den jeweiligen Zustand
+    public void Bearbeiten() => _aktuellerStatus.Bearbeiten(this);
+    public void Genehmigen() => _aktuellerStatus.Genehmigen(this);
+}
+```
+
+## Vorteile des State Patterns
+- Wir eliminieren gewaltige bedingte Anweisungen (`if/switch`).
+- Das Hinzufügen eines neuen Zwischenschritts (z.B. `InWiderspruchsPruefung`) erfordert lediglich eine neue Klasse und eine Anpassung des Vorgängers.
+- Der Code für einen bestimmten Zustand ist an einem einzigen Ort versammelt (Single Responsibility).
+
+# Teil 5: Zusammenfassung
+
+## Wrap-up Woche 3
+- **Strategy:** Kapselt Algorithmen (z.B. verschiedene Steuergesetze) und macht sie austauschbar, ohne die Kern-Anwendung zu ändern.
+- **Observer:** Informiert viele Interessenten entkoppelt über Zustandsänderungen (Publish/Subscribe-Prinzip).
+- **State:** Objektorientierte Alternative zur Switch-Case-Hölle für komplexe Lebenszyklen und Workflows.
+
+## Muster kombinieren
+In realen Anwendungen treten Muster selten isoliert auf.
+Ein `Bauantrag` (State) könnte eine `GebuehrenStrategie` (Strategy) nutzen, und bei jedem Zustandswechsel seine `IStatusBeobachter` (Observer) informieren.
+
+## Ausblick auf Woche 4
+Wir verlassen die Ebene der mikroskopischen Muster (Klassen) und betrachten in der nächsten Woche die makroskopische Ebene (Systeme): 
+Die **SOLID-Prinzipien** und die **Schichtenarchitektur (Layered Architecture)**.

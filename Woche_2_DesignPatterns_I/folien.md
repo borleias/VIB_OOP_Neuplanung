@@ -1,6 +1,6 @@
 ---
 title: "Objektorientierte Programmierung (Vertiefung)"
-subtitle: "Woche 2: Design Patterns I – Erzeugung & Struktur"
+subtitle: "Woche 2: Design Patterns I – Struktur und Erzeugung"
 author: "Dr. Peter Bernhardt"
 date: "März 2026"
 section-titles: true
@@ -8,106 +8,365 @@ section-titles: true
 
 # Teil 1: Einführung in Design Patterns
 
-## Was sind Entwurfsmuster?
-Entwurfsmuster sind bewährte Lösungen für häufig auftretende Probleme im Software-Design. Sie repräsentieren Best Practices, die über Jahrzehnte von Software-Entwicklern entwickelt wurden. Ein Muster ist keine fertige Implementierung, sondern eine Vorlage, wie ein Problem gelöst werden kann.
+## Willkommen zu Woche 2
+Nachdem wir uns in der ersten Woche mit Clean Code beschäftigt haben, gehen wir nun einen Schritt weiter: zum Software-Design. 
+Wir schauen uns an, wie man architektonische Probleme löst, die immer wieder auftreten.
 
-In der Verwaltungsinformatik helfen sie uns, komplexe Fachlogik (wie Gesetze und Verordnungen) in flexiblen und wartbaren Code zu übersetzen. Wir nutzen sie, um das Rad nicht jedes Mal neu erfinden zu müssen.
+**Lernziele:**
+- Das Konzept der Design Patterns verstehen.
+- Erzeugungsmuster (Singleton, Factory Method) anwenden.
+- Strukturmuster (Adapter, Decorator) in der Praxis nutzen.
 
-## Kategorien von Patterns
-Die "Gang of Four" (GoF), die Pioniere der Design Patterns, unterteilten sie in drei Hauptgruppen:
+## Was sind Design Patterns?
+Design Patterns (Entwurfsmuster) sind bewährte Lösungsschablonen für wiederkehrende Probleme im Software-Design.
+- Sie wurden maßgeblich durch die "Gang of Four" (GoF) im Jahr 1994 formalisiert.
+- Es sind keine fertigen Code-Schnipsel, sondern abstrakte Konzepte.
+- Sie bilden ein gemeinsames Vokabular für Entwickler.
 
-1. **Erzeugungsmuster (Creational):** Mechanismen zur Objekterstellung, die die Komplexität der Instanziierung verbergen.
-2. **Strukturmuster (Structural):** Erleichtern das Design durch das Identifizieren einfacher Wege, um Beziehungen zwischen Einheiten zu realisieren.
-3. **Verhaltensmuster (Behavioral):** Identifizieren allgemeine Kommunikationsmuster zwischen Objekten.
+## Warum Design Patterns in der Verwaltung?
+In der Verwaltungsinformatik bauen wir Systeme für die Ewigkeit.
+- **Gesetzesänderungen:** Algorithmen ändern sich, das System muss flexibel bleiben.
+- **Legacy-Systeme:** Wir müssen oft alte mit neuen Systemen verbinden.
+- Patterns helfen uns, robuste, erweiterbare und wartbare Architekturen zu schaffen.
 
-Heute fokussieren wir uns auf die ersten beiden Kategorien.
+## Drei Kategorien von Mustern
+Die GoF unterteilt Muster in drei Hauptkategorien:
+1. **Erzeugungsmuster (Creational):** Wie werden Objekte flexibel erzeugt?
+2. **Strukturmuster (Structural):** Wie werden Klassen und Objekte zu größeren Strukturen zusammengefügt?
+3. **Verhaltensmuster (Behavioral):** Wie kommunizieren Objekte effizient miteinander?
 
-# Teil 2: Singleton (Erzeugungsmuster)
+## Keine "Copy-Paste" Lösungen
+Wichtig: Ein Design Pattern ist keine Bibliothek, die man einbindet.
+- Sie müssen das Muster an Ihre spezifische Domäne (z.B. das Meldewesen) anpassen.
+- Setzen Sie Muster nur ein, wenn Sie das entsprechende Problem haben (Vermeidung von Over-Engineering!).
 
-## Das Singleton-Prinzip
-Das Singleton-Muster stellt sicher, dass eine Klasse nur eine einzige Instanz hat und bietet einen globalen Zugriffspunkt auf diese Instanz.
+# Teil 2: Das Singleton Pattern
 
-**Warum brauchen wir das?**
-In vielen Systemen gibt es Ressourcen, die nur einmal existieren sollten:
-- Ein zentraler Konfigurationsmanager.
-- Ein Log-Writer, der in eine einzige Datei schreibt.
-- Ein Verbindungspool zu einer Datenbank.
+## Einführung: Singleton
+Das Singleton-Muster gehört zu den Erzeugungsmustern. 
+Es stellt sicher, dass von einer Klasse **genau eine einzige Instanz** existiert und bietet einen globalen Zugriffspunkt darauf.
 
-Mehrere Instanzen würden hier zu Inkonsistenzen oder unnötigem Ressourcenverbrauch führen.
+## Problemstellung
+Oft gibt es Ressourcen in einem System, die nur einmal vorhanden sein dürfen.
+Wenn Sie beispielsweise eine Verbindungskonfiguration laden, wollen Sie nicht, dass 10 verschiedene Module 10 verschiedene Kopien dieser Konfiguration im Speicher halten.
 
-## Implementierung des Singletons
-In C# nutzen wir einen privaten Konstruktor und eine statische Eigenschaft.
+## Anwendung in der Verwaltung (Konfigurationsmanager)
+Stellen Sie sich ein Fachverfahren vor. Es gibt zentrale Einstellungen:
+- URL des zentralen Melderegisters
+- Aktuelle Mehrwertsteuersätze
+- Name der ausführenden Behörde
 
+Ein `KonfigurationsManager` als Singleton stellt sicher, dass alle Module exakt denselben Stand dieser Daten nutzen.
+
+## Singleton: Die Eigenschaften
+Wie erreicht man, dass eine Klasse nur einmal instanziiert werden kann?
+1. Ein **privater Konstruktor** verhindert, dass jemand von außen `new` aufruft.
+2. Eine **statische Variable** hält die einzige Instanz.
+3. Eine **öffentliche statische Eigenschaft** liefert diese Instanz zurück.
+
+## Singleton: Code (Felder & Konstruktor)
 ```csharp
-public sealed class ConfigManager {
-    private static ConfigManager _instance;
+public sealed class KonfigurationsManager
+{
+    private static KonfigurationsManager _instance;
     private static readonly object _lock = new object();
 
-    private ConfigManager() {} // Verhindert 'new'
+    // Privater Konstruktor verhindert Instanziierung von außen
+    private KonfigurationsManager() 
+    {
+        RegisterUrl = "https://zentralregister.behoerde.de/api";
+        BehoerdenName = "Landesamt für Digitalisierung";
+    }
 
-    public static ConfigManager Instance {
-        get {
-            lock(_lock) {
-                if (_instance == null) _instance = new ConfigManager();
-                return _instance;
+    public string RegisterUrl { get; set; }
+    public string BehoerdenName { get; set; }
+    // ...
+```
+
+## Singleton: Code (Thread-Safe Instance)
+```csharp
+    public static KonfigurationsManager Instance
+    {
+        get
+        {
+            // Thread-safe Implementierung (Double-Check Locking)
+            if (_instance == null)
+            {
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new KonfigurationsManager();
+                    }
+                }
             }
+            return _instance;
         }
     }
 }
 ```
-Die `lock`-Anweisung sorgt dafür, dass das Muster auch in Multi-Threading-Umgebungen (z.B. Web-Servern) sicher funktioniert.
 
-# Teil 3: Factory Method (Erzeugungsmuster)
+## Kritik am Singleton
+Das Singleton wird oft als "Anti-Pattern" bezeichnet. Warum?
+- Es führt einen **globalen Zustand** (Global State) ein, der von überall geändert werden kann.
+- Es verdeckt Abhängigkeiten: Eine Klasse, die das Singleton nutzt, zeigt dies nicht in ihrem Konstruktor.
+- Es erschwert das **Unit Testing** (Mocking), da man die feste Instanz nur schwer durch einen Fake ersetzen kann.
 
-## Das Problem: Starre Objekterstellung
-Wenn wir in unserem Code direkt `new BewilligungsBescheid()` schreiben, binden wir uns fest an diese konkrete Klasse. Wenn später ein neuer Bescheid-Typ (z.B. "Vorläufiger Bescheid") hinzukommt, müssen wir den Code an vielen Stellen ändern.
+## Wann man es (wirklich) nutzen sollte
+Nutzen Sie Singleton nur, wenn die Instanzierung wirklich systemweit streng limitiert sein **muss** (z.B. Hardware-Treiber, Logging-Dienste in kleinen Systemen). 
+In modernen Web-Anwendungen überlässt man diese Aufgabe oft dem "Dependency Injection Container" (dazu mehr in Woche 4).
 
-Die Factory Method löst dies, indem sie die Erstellungslogik in eine eigene Methode auslagert.
+# Teil 3: Factory Method Pattern
 
-## Anwendung: Bescheid-Erstellung
-Ein Sachbearbeiter-System weiß, *dass* ein Bescheid erstellt werden muss, aber erst zur Laufzeit wird entschieden, *welcher* Typ es ist (basierend auf der Antragsprüfung).
+## Einführung: Factory Method
+Das Factory Method Pattern definiert ein Interface zur Erstellung eines Objekts.
+Die Entscheidung, **welche** konkrete Klasse instanziiert wird, wird jedoch an die Unterklassen delegiert.
 
-- **Interface:** `IBescheid`
-- **Konkrete Klassen:** `Zulassung`, `Ablehnung`
-- **Factory:** `BescheidCreator` entscheidet basierend auf Logik, welches Objekt zurückgegeben wird.
+## Problemstellung: Harte Verdrahtung
+Wenn Sie überall im Code `new BewilligungsBescheid()` schreiben, koppeln Sie Ihre Logik eng an diese konkrete Klasse.
+Was passiert, wenn sich der Prozess zur Erstellung ändert oder neue Bescheid-Arten hinzukommen? Der Code wird unflexibel.
 
-Dies fördert die lose Kopplung: Der aufrufende Code arbeitet nur mit dem Interface `IBescheid`.
+## Anwendung: Erstellung von Bescheid-Typen
+Ein Fachverfahren muss verschiedene Arten von Bescheiden erzeugen:
+- Bewilligungsbescheid
+- Ablehnungsbescheid
+- Gebührenbescheid
 
-# Teil 4: Adapter (Strukturmuster)
+Der Versandprozess (Drucken, Kuvertieren, Porto) ist bei allen gleich, nur der Inhalt variiert.
 
-## Die Brücke zwischen Alt und Neu
-In der Verwaltung arbeiten wir oft mit Legacy-Systemen (Großrechner, alte Datenbanken). Diese haben oft Schnittstellen, die nicht zu modernen Standards passen.
+## Factory Method: Produkt-Klassen (Code)
+Wir definieren ein abstraktes Produkt und konkrete Implementierungen:
 
-Der Adapter fungiert als "Übersetzer":
-- Er implementiert ein modernes Interface, das unsere Anwendung erwartet.
-- Intern ruft er die kryptischen Funktionen des alten Systems auf.
-- Er konvertiert die Datenformate (z.B. von COBOL-Strings zu C#-Objekten).
+```csharp
+// Das Produkt-Interface / abstrakte Basisklasse
+public abstract class Bescheid
+{
+    public abstract void GeneriereInhalt();
+}
 
-## Beispiel: Melderegister-Anbindung
-Unsere moderne Web-App erwartet ein `IPersonenService`. Das vorhandene Melderegister liefert aber nur Rohdaten über eine veraltete DLL-Schnittstelle.
+// Konkrete Produkte
+public class BewilligungsBescheid : Bescheid
+{
+    public override void GeneriereInhalt() 
+        => Console.WriteLine("Ihr Antrag wurde bewilligt.");
+}
 
-Der `MelderegisterAdapter` nimmt die Anfrage entgegen, ruft die DLL auf, parst den zurückgegebenen Text-String und gibt ein sauberes `Buerger`-Objekt an die Web-App zurück. Die Web-App "merkt" nicht einmal, dass sie mit einem 30 Jahre alten System spricht.
+public class AblehnungsBescheid : Bescheid
+{
+    public override void GeneriereInhalt() 
+        => Console.WriteLine("Ihr Antrag wurde leider abgelehnt.");
+}
+```
 
-# Teil 5: Decorator (Strukturmuster)
+## Factory Method: Die abstrakte Factory (Code)
+Die Kernlogik arbeitet nur mit der Abstraktion, nicht mit den konkreten Typen.
 
-## Dynamische Erweiterung statt Vererbung
-Vererbung führt oft zu einer "Klassen-Explosion". Wenn wir einen `Antrag` haben und Optionen wie `Express`, `Einschreiben` und `International` kombinieren wollen, bräuchten wir Klassen für jede Kombination: `ExpressEinschreibenAntrag`, `InternationalExpressAntrag` etc.
+```csharp
+// Die Factory (Erzeuger)
+public abstract class BescheidErzeuger
+{
+    // Die eigentliche Factory Method
+    public abstract Bescheid ErstelleBescheid();
 
-Der Decorator erlaubt es uns, Funktionalität zur Laufzeit "um ein Objekt herumzuwickeln".
+    // Die Kernlogik (für alle gleich!)
+    public void SendeBescheid()
+    {
+        var bescheid = ErstelleBescheid();
+        bescheid.GeneriereInhalt();
+        Console.WriteLine("Bescheid wird per Post/E-Mail versendet.");
+    }
+}
+```
 
-## Beispiel: Antrags-Zusatzleistungen
-1. Wir starten mit einem `BasisAntrag`.
-2. Wir wickeln einen `ExpressDecorator` darum (erhöht Kosten).
-3. Wir wickeln einen `VersandDecorator` darum (fügt Versandinfo hinzu).
+## Factory Method: Konkrete Erzeuger (Code)
+Die Entscheidung der Instanziierung liegt in diesen kleinen Unterklassen.
 
-Jeder Decorator implementiert das gleiche Interface wie das Basis-Objekt und delegiert die Arbeit an das eingewickelte Objekt weiter, wobei er eigenes Verhalten hinzufügt.
+```csharp
+// Konkrete Erzeuger
+public class BewilligungsErzeuger : BescheidErzeuger
+{
+    public override Bescheid ErstelleBescheid() 
+        => new BewilligungsBescheid();
+}
 
-# Zusammenfassung
+public class AblehnungsErzeuger : BescheidErzeuger
+{
+    public override Bescheid ErstelleBescheid() 
+        => new AblehnungsBescheid();
+}
+```
 
-## Key Takeaways
-- **Singleton:** Zentrale Instanz für globale Ressourcen (Konfiguration).
-- **Factory Method:** Flexibilität bei der Erstellung von Objekten (Bescheide).
-- **Adapter:** Kompatibilität mit Altsystemen (Zentralregister).
-- **Decorator:** Flexible Erweiterung von Objekten ohne Klassen-Explosion (Zusatzleistungen).
+## Vorteile der Factory Method
+- **Single Responsibility:** Die Erzeugung der Objekte ist vom Rest des Codes isoliert.
+- **Open-Closed Principle:** Sie können neue Bescheid-Arten (z.B. `AnhoerungsBescheid`) hinzufügen, ohne den bestehenden Versand-Code zu verändern.
 
-Design Patterns sind Werkzeuge, kein Selbstzweck. Setzen Sie sie dort ein, wo sie die Wartbarkeit erhöhen und Komplexität reduzieren.
+# Teil 4: Adapter Pattern
+
+## Einführung: Adapter Pattern
+Der Adapter ist ein Strukturmuster. Er erlaubt es Objekten mit inkompatiblen Schnittstellen (Interfaces), zusammenzuarbeiten.
+Er verhält sich wie ein Reiseadapter für Steckdosen: Er macht den fremden Stecker passend für die lokale Infrastruktur.
+
+## Das Problem: Legacy-Systeme
+In der Verwaltung können Sie Altsysteme nicht einfach abschalten. Sie müssen moderne Portale mit 20 Jahre alten Mainframes verbinden. 
+Das moderne Portal erwartet saubere C#-Objekte, das alte System liefert aber z.B. kryptische, semikolon-getrennte Strings.
+
+## Anwendung: Anbindung eines Zentralregisters
+Wir haben ein Web-Portal, das eine `Person` benötigt. 
+Das Legacy-Zentralregister hat keine moderne REST-API, sondern nur eine Funktion, die einen String wie `"Mustermann;Max;1980-01-01"` zurückgibt.
+
+## Adapter: Das Ziel-Interface (Code)
+So möchte unser modernes System arbeiten:
+
+```csharp
+public class Person {
+    public string Vorname { get; set; }
+    public string Nachname { get; set; }
+    public DateTime Geburtsdatum { get; set; }
+}
+
+// Bestehendes, modernes System erwartet dieses Interface
+public interface IPersonenQuelle
+{
+    Person GetPerson(string id);
+}
+```
+
+## Adapter: Das alte System (Code)
+Die inkompatible Klasse, die wir nicht ändern können oder dürfen:
+
+```csharp
+// Das alte Legacy-System (inkompatibel)
+public class AltesRegisterSystem
+{
+    public string SuchePersonDatensatz(string personalId) 
+    {
+        // Simulation eines alten Datenbank-Aufrufs
+        // Liefert z.B. "Mustermann;Max;1980-01-01"
+        return "Mustermann;Max;1980-01-01";
+    }
+}
+```
+
+## Adapter: Die Implementierung (Code)
+Der Adapter übersetzt zwischen den Welten:
+
+```csharp
+// Der Adapter schließt die Lücke
+public class RegisterAdapter : IPersonenQuelle
+{
+    private readonly AltesRegisterSystem _legacySystem = new AltesRegisterSystem();
+
+    public Person GetPerson(string id)
+    {
+        string rohDaten = _legacySystem.SuchePersonDatensatz(id);
+        string[] teile = rohDaten.Split(';');
+        
+        return new Person {
+            Nachname = teile[0],
+            Vorname = teile[1],
+            Geburtsdatum = DateTime.Parse(teile[2])
+        };
+    }
+}
+```
+
+## Vorteile des Adapters
+- Das moderne System bleibt völlig unabhängig von den Eigenheiten des Legacy-Systems.
+- Wenn das alte Register irgendwann durch ein neues ersetzt wird, müssen wir nur einen neuen Adapter schreiben – die Fachlogik bleibt unberührt.
+
+# Teil 5: Decorator Pattern
+
+## Einführung: Decorator Pattern
+Der Decorator ist ein Strukturmuster, das es erlaubt, einem Objekt dynamisch zusätzliches Verhalten hinzuzufügen.
+Es ist eine flexible Alternative zur klassischen Vererbung.
+
+## Das Problem der Klassenexplosion
+Angenommen, Sie haben Basis-Anträge und möchten Zusatzoptionen anbieten.
+Wenn Sie Vererbung nutzen, brauchen Sie für jede Kombination eine Klasse:
+- `Reisepass`
+- `ReisepassMitExpress`
+- `ReisepassMit48Seiten`
+- `ReisepassMitExpressUnd48Seiten`
+Das führt zu Hunderten von Klassen!
+
+## Anwendung: Antrags-Zusatzleistungen
+In der Verwaltung können Bürger oft Optionen (Express-Zuschlag, Zustellung per Post) dazubuchen.
+Statt die Vererbungshierarchie aufzublähen, "dekorieren" (umhüllen) wir das Basis-Objekt wie eine Zwiebel.
+
+## Decorator: Basis und Komponente (Code)
+```csharp
+// Das Basis-Interface
+public interface IAntrag
+{
+    double BerechneKosten();
+    string GetBeschreibung();
+}
+
+// Die konkrete Basis-Komponente
+public class ReisepassAntrag : IAntrag
+{
+    public double BerechneKosten() => 60.00;
+    public string GetBeschreibung() => "Reisepass (Standard)";
+}
+```
+
+## Decorator: Die Basis-Decorator-Klasse (Code)
+Diese Klasse leitet die Aufrufe standardmäßig an das umhüllte Objekt (`_antrag`) weiter.
+
+```csharp
+// Basis-Decorator
+public abstract class AntragDecorator : IAntrag
+{
+    protected IAntrag _antrag;
+    
+    public AntragDecorator(IAntrag antrag) => _antrag = antrag;
+    
+    public virtual double BerechneKosten() => _antrag.BerechneKosten();
+    public virtual string GetBeschreibung() => _antrag.GetBeschreibung();
+}
+```
+
+## Decorator: Der konkrete Decorator (Code)
+Hier fügen wir das neue Verhalten hinzu:
+
+```csharp
+// Konkreter Decorator: Express Option
+public class ExpressOption : AntragDecorator
+{
+    public ExpressOption(IAntrag antrag) : base(antrag) { }
+    
+    public override double BerechneKosten() 
+        => base.BerechneKosten() + 32.00; // Zuschlag
+        
+    public override string GetBeschreibung() 
+        => base.GetBeschreibung() + " + Express-Zuschlag";
+}
+```
+
+## Nutzung des Decorators
+So setzen wir die Zwiebel zusammen:
+```csharp
+// 1. Basis erstellen (60 EUR)
+IAntrag meinAntrag = new ReisepassAntrag();
+
+// 2. Mit Express dekorieren (+32 EUR)
+meinAntrag = new ExpressOption(meinAntrag);
+
+Console.WriteLine(meinAntrag.GetBeschreibung()); 
+// Ausgabe: Reisepass (Standard) + Express-Zuschlag
+Console.WriteLine(meinAntrag.BerechneKosten());  
+// Ausgabe: 92.00
+```
+Sie können Optionen beliebig ineinander verschachteln!
+
+# Teil 6: Zusammenfassung
+
+## Wrap-up Woche 2
+- **Singleton:** Wenn es garantiert nur ein Objekt geben darf (Vorsicht: Anti-Pattern Gefahr!).
+- **Factory Method:** Delegation der Objekterzeugung an Unterklassen (für Flexibilität).
+- **Adapter:** Der Übersetzer zwischen inkompatiblen Welten (Legacy-Integration).
+- **Decorator:** Dynamisches Hinzufügen von Funktionen ohne Klassenexplosion.
+
+## Ausblick auf nächste Woche
+Diese Woche haben wir Objekte erzeugt (Creational) und strukturiert (Structural).
+Nächste Woche betrachten wir die dritte Kategorie: **Verhaltensmuster (Behavioral Patterns)**, wie das Strategy- und Observer-Pattern.
