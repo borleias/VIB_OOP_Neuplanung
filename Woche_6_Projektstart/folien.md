@@ -13,11 +13,6 @@ Wir haben den theoretischen Gipfel dieses Kurses erreicht. Architekturen, Patter
 Heute betrachten wir die Brücke zur realen Welt: Wie interagieren unsere sauberen Systeme effizient und ausfallsicher mit der Außenwelt (APIs, Datenbanken)?
 Zudem geben wir heute den Startschuss für Ihre praktischen Abschlussprojekte.
 
-**Lernziele:**
-- Asynchrone Programmierung mit `async` / `await` verstehen.
-- Fehler in komplexen Systemen robust behandeln (Error Handling).
-- Das Abschlussprojekt planen und aufsetzen.
-
 ## Die vernetzte Verwaltung
 Kein modernes Fachverfahren arbeitet mehr isoliert.
 Wir müssen das zentrale Melderegister abfragen, PDF-Generatoren in der Cloud ansprechen oder Geodaten bei einem Karten-Dienst laden.
@@ -33,13 +28,22 @@ Asynchronität bedeutet: Das Programm schickt die Anfrage an das Netzwerk ab und
 
 # Teil 2: Asynchrone Programmierung (Async / Await)
 
-## Die Lösung: Asynchrone Ausführung
-Asynchronität bedeutet: Das Programm schickt die Anfrage an das Netzwerk ab und sagt dem Thread: "Du bist frei, mach in der Zwischenzeit andere Arbeit (z.B. andere Bürger bedienen). Sag mir Bescheid, wenn die Daten da sind, dann rechne ich hier weiter."
+## I/O-Bound vs. CPU-Bound
+Es gibt zwei Arten von Aufgaben:
+1. **I/O-Bound:** Warten auf Netzwerk, Festplatte oder Datenbank. Hier ist Asynchronität perfekt, da die CPU während des Wartens nichts zu tun hat.
+2. **CPU-Bound:** Komplexe Berechnungen (z.B. Verschlüsselung). Hier nutzt man eher Parallelität auf mehreren Kernen, da die CPU aktiv arbeitet.
 
 ## C# und die Task Parallel Library (TPL)
-C# hat asynchrone Programmierung revolutioniert. Anstatt komplexe "Callbacks" zu schreiben, bietet C# zwei magische Schlüsselwörter:
-`async` und `await`.
+C# hat asynchrone Programmierung revolutioniert. Anstatt komplexe "Callbacks" zu schreiben, bietet C# zwei magische Schlüsselwörter: `async` und `await`.
 Zusammen mit der Klasse `Task<T>` ermöglichen sie uns, asynchronen Code zu schreiben, der sich fast genau so liest wie synchroner Code.
+
+## Wie funktioniert ein Task?
+Ein `Task` repräsentiert eine laufende Operation. Er ist wie ein "Gutschein" für ein zukünftiges Ergebnis.
+- `Task`: Eine Operation ohne Rückgabewert (wie `void`).
+- `Task<T>`: Eine Operation, die ein Ergebnis vom Typ `T` liefern wird.
+
+## Das Schlüsselwort: await
+Das `await`-Schlüsselwort bewirkt, dass die Ausführung der Methode pausiert wird, bis der Task abgeschlossen ist. Währenddessen wird der aufrufende Thread freigegeben und kann andere Aufgaben bearbeiten. Sobald der Task fertig ist, kehrt die Methode an genau diese Stelle zurück.
 
 ## Beispiel: Asynchrone Abfrage (Code)
 Wir kennzeichnen die Methode mit `async Task<T>` und warten mit `await` auf das Netzwerk.
@@ -50,7 +54,7 @@ using System.Threading.Tasks;
 
 public class MeldeService
 {
-    // Die Methode gibt keinen string zurück, sondern ein "Versprechen" (Task) auf einen String
+    // Die Methode gibt keinen string zurück, sondern ein "Versprechen" (Task)
     public async Task<string> HoleBuergerDatenAsync(string id) 
     {
         HttpClient client = new HttpClient();
@@ -64,24 +68,24 @@ public class MeldeService
 }
 ```
 
-## Parallelität: Der Turbo-Boost
+## Parallelität: Task.WhenAll
 Noch mächtiger wird es, wenn wir Daten aus *mehreren* Quellen brauchen. 
 Anstatt Quelle A abzufragen (warten), dann Quelle B (warten), können wir beide Anfragen gleichzeitig auf die Reise schicken.
 
-## Parallele Ausführung (Code)
+## Vorteile der Parallelität
+Durch parallele Abfragen reduziert sich die Gesamtwartezeit drastisch. Statt der Summe aller Wartezeiten warten wir nur so lange, wie die langsamste Einzelabfrage dauert. In vernetzten Systemen ist das ein massiver Performance-Gewinn.
+
+## Beispiel: Parallele API-Abfragen (Code)
 ```csharp
 public async Task<BuergerDaten> HoleVollstaendigeDatenAsync(string id)
 {
-    // Wir rufen die Methoden auf, OHNE 'await' davor. 
-    // Das startet die Anfragen parallel im Hintergrund.
-    var meldeTask = _apiClient.GetMelderegisterAsync(id);
+    // Wir starten zwei Abfragen gleichzeitig (parallel)
+    var meldeTask = _apiClient.GetMelderegisterDatenAsync(id);
     var steuerTask = _apiClient.GetSteuerDatenAsync(id);
 
-    // Jetzt sagen wir: Wir können erst weitermachen, 
-    // wenn BEIDE Aufgaben fertig sind.
+    // Hier warten wir auf beide Ergebnisse, ohne den Thread zu blockieren
     await Task.WhenAll(meldeTask, steuerTask);
 
-    // Hier sind garantiert beide Ergebnisse verfügbar
     return new BuergerDaten {
         Name = meldeTask.Result.Name,
         SteuerKlasse = steuerTask.Result.Klasse
@@ -110,9 +114,17 @@ catch { /* Ignorieren */ }
 In großen Fachverfahren ist dieses "Verschlucken" von Fehlern fatal. Der Bürger denkt, der Antrag ging durch, aber er liegt nie in der Datenbank.
 
 ## Das "Fail Fast" Prinzip
-Prüfen Sie Rahmenbedingungen so früh wie möglich an der Außengrenze Ihres Systems (z.B. im Controller).
-Wenn die `SteuerId` des Antrags leer ist, macht es keinen Sinn, den Service aufzurufen, die DB zu öffnen etc.
-Werfen Sie sofort eine Exception (z.B. `ArgumentException`) und brechen Sie ab.
+Prüfen Sie Rahmenbedingungen so früh wie möglich (Validation).
+Wenn die `SteuerId` des Antrags leer ist, macht es keinen Sinn, den Service aufzurufen. Werfen Sie sofort eine Exception und brechen Sie ab, bevor teure Ressourcen (DB-Verbindungen) verbraucht werden.
+
+## Vorteile von Fail-Fast
+1. **Ressourcenschonung:** Keine unnötigen DB-Aufrufe.
+2. **Klarheit:** Der Fehler wird dort gemeldet, wo er verursacht wurde.
+3. **Sicherheit:** Verhindert, dass das System mit korrupten Daten arbeitet.
+
+## Lokales vs. Globales Error Handling
+1. **Lokal:** Fangen Sie Fehler dort ab, wo Sie sie *behandeln* können (z.B. einen Retry-Mechanismus bei Netzwerkproblemen).
+2. **Global:** Nutzen Sie in Web-Anwendungen eine zentrale Middleware, um alle unvorhergesehenen Fehler zu loggen und dem Nutzer eine freundliche Meldung zu zeigen.
 
 ## Spezifische Exceptions fangen
 Fangen Sie nur Fehler, die Sie auch *sinnvoll behandeln* können.
@@ -120,8 +132,11 @@ Wenn die Festplatte brennt (`OutOfMemoryException`), kann Ihr Code das nicht beh
 Fangen Sie spezifische Dinge wie `SqlException` (um z.B. einen Verbindungsversuch 3 Sekunden später nochmal zu wiederholen).
 
 ## Fachliche vs. Technische Fehler
-- **Fachlich (User-Fehler):** Der Bürger ist zu jung für den Führerschein. Das Programm funktioniert einwandfrei. Wir zeigen dem Nutzer eine nette Meldung: "Sie erfüllen die Voraussetzungen nicht."
-- **Technisch (System-Fehler):** Die Datenbank antwortet nicht. Wir zeigen dem Nutzer: "Systemfehler, Support informiert", loggen aber für uns den exakten Stacktrace.
+- **Fachlich (User-Fehler):** Der Bürger ist zu jung. Zeigen Sie eine nette Meldung: "Sie erfüllen die Voraussetzungen nicht."
+- **Technisch (System-Fehler):** Die Datenbank antwortet nicht. Loggen Sie den Fehler für den Admin und zeigen Sie dem Nutzer: "Ein technisches Problem ist aufgetreten."
+
+## Fehler-Propagierung
+Exceptions sollten nur dann gefangen werden, wenn man sie sinnvoll behandeln kann. Ansonsten ist es besser, sie nach oben (an den Aufrufer) weiterzureichen, bis sie eine Schicht erreichen, die eine Entscheidung treffen kann (z.B. UI zeigt Fehlermeldung).
 
 ## Die Wichtigkeit von Logging
 "Ein Fehler, der nicht geloggt wurde, hat nie stattgefunden."
@@ -151,26 +166,38 @@ catch (Exception ex)
 }
 ```
 
-# Teil 4: Projektstart
+# Teil 4: Projektstart & Abschluss
 
 ## Das Abschlussprojekt
 Ab heute beginnt die Praxis-Phase. Sie haben nun den restlichen Kurszeitraum Zeit, ein eigenes Fachverfahren zu entwickeln.
 Es geht nicht darum, ein riesiges System mit hunderten Funktionen zu bauen. Es geht darum, ein **kleines System architektonisch perfekt** zu konstruieren.
 
-## Die Architektur-Anforderungen
-Ihr Code muss die Konzepte der letzten Wochen widerspiegeln:
-1. **Schichtenarchitektur:** Trennen Sie klar zwischen UI (z.B. Console), Business-Logik und Datenhaltung.
-2. **SOLID:** Wenden Sie die Prinzipien an (insbesondere Dependency Injection).
-3. **Design Patterns:** Nutzen Sie mindestens zwei Muster (z.B. Factory für die Dokumentenerzeugung, Strategy für Regeln).
-4. **Testing:** Sichern Sie die komplexeste Klasse Ihres Business-Layers mit xUnit ab.
+## Architektur-Anforderungen
+Ihr Projekt muss folgende Kriterien erfüllen:
+1. **Schichtenarchitektur:** UI, Business Logic und Data Access Layer strikt getrennt.
+2. **SOLID:** Bewusste Anwendung der Prinzipien (insb. DI).
+3. **Design Patterns:** Mindestens zwei Muster implementiert.
+4. **Testing:** Kernlogik mit Unit Tests (xUnit) abgesichert.
 
-## Themenvorschläge (Auswahl)
-Wählen Sie ein Projekt aus der Liste in `Projektaufgaben.md` oder schlagen Sie ein eigenes vor.
-Einige Highlights:
-- **KFZ-Zulassungsstelle:** Verwaltung von Fahrzeugen, Haltern und Kennzeichen-Reservierungen.
-- **Bauantrags-Workflow:** State-Machine für komplexe Antragsprozesse.
-- **Wohngeld-Rechner:** Hochkomplexe, testbare Regelwerke (Strategy-Pattern!).
-- **Digitales Fundbüro:** Matching-Algorithmen und Observer-Pattern für Benachrichtigungen.
+## Clean Code Kriterien
+- **Sprechende Namen:** Klassen und Methoden müssen selbsterklärend sein.
+- **Kleine Methoden:** Jede Methode sollte nur eine Sache tun.
+- **Kommentare:** Nur dort, wo das "Warum" nicht aus dem Code hervorgeht.
+
+## Dokumentation des Projekts
+Erwarten Sie nicht nur Code. Ein kurzes README, das Ihre Design-Entscheidungen (welche Patterns? warum diese Architektur?) erläutert, ist Teil der Abgabe und hilft bei der Bewertung.
+
+## Bewertungskriterien
+- **Struktur (40%):** Korrekte Schichtentrennung und Interface-Nutzung.
+- **Patterns (20%):** Sinnvoller Einsatz von Design Patterns.
+- **Tests (20%):** Aussagekräftige Unit Tests für die Business-Logik.
+- **Funktionalität (20%):** Das Kernfeature läuft fehlerfrei.
+
+## Themenvorschläge
+- **KFZ-Zulassungsstelle:** Verwaltung von Kennzeichen und Haltern.
+- **Bauantrags-Workflow:** Status-Management von Anträgen.
+- **Wohngeld-Rechner:** Komplexe Berechnungslogik (Strategy-Pattern!).
+- **Hundesteuer-Portal:** Anmeldung und Bescheiderstellung.
 
 ## Der Workflow für die nächsten Wochen
 - Überlegen Sie sich Ihr Thema und definieren Sie das Kern-Feature.

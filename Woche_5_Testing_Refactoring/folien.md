@@ -12,28 +12,28 @@ section-titles: true
 Software, die ungetestet ist, ist Software, der man nicht vertrauen kann. Bisher haben wir unseren Code manuell geprüft, indem wir das Programm gestartet und Eingaben gemacht haben. Das ist auf Dauer nicht tragbar.
 Heute lernen wir, wie Code automatisch seinen eigenen Code testet.
 
-**Lernziele:**
-- Unit Tests mit xUnit in .NET schreiben.
-- Die AAA-Regel anwenden.
-- Abhängigkeiten durch Mocking isolieren.
-- Test-Driven Development (TDD) als Workflow verstehen.
-
 ## Die Kosten von unentdeckten Fehlern
 Warum testen wir?
 Je später ein Fehler (Bug) im Software-Lifecycle gefunden wird, desto teurer wird seine Behebung.
 - Gefunden beim Coden: Sekunden (Kosten = ~0€)
 - Gefunden beim Build: Minuten
 - Gefunden durch Tester: Stunden bis Tage
-- Gefunden vom Bürger im Produktivbetrieb (Produktion): Krisenmeetings, Datenverlust, massiver Imageschaden.
+- Gefunden in Produktion: Krisenmeetings, Datenverlust, massiver Imageschaden.
 
 ## Was ist ein Unit Test?
 Ein Unit Test (Einheitentest) ist ein kleines, automatisiertes Code-Snippet, das eine spezifische Funktionalität der Anwendung (meist eine einzige Methode einer Klasse) prüft.
 Er stellt sicher, dass sich die Methode exakt so verhält, wie der Entwickler es bei der Erstellung vorgesehen hat.
 
+## Ziele des Unit Testings
+1. **Korrektheit:** Beweisen, dass der Code tut, was er soll.
+2. **Regressionsschutz:** Sicherstellen, dass neue Änderungen alte Funktionen nicht brechen.
+3. **Dokumentation:** Tests zeigen anderen Entwicklern, wie eine Klasse benutzt werden soll.
+4. **Design-Check:** Code, der schwer zu testen ist, ist meist auch schlecht entworfen (enge Kopplung).
+
 # Teil 2: Tests schreiben mit xUnit
 
 ## xUnit in .NET
-xUnit ist das De-facto-Standard-Framework für das Testen von C#-Anwendungen (neben NUnit und MSTest).
+xUnit ist das De-facto-Standard-Framework für das Testen von C#-Anwendungen.
 Es bietet uns Attribute wie `[Fact]` und `[Theory]`, um dem Compiler mitzuteilen: "Dies ist keine normale Methode, sondern ein Testlauf."
 
 ## Die Struktur: Das AAA-Pattern
@@ -42,8 +42,15 @@ Jeder gute Unit Test folgt dem AAA-Schema:
 2. **Act (Ausführen):** Genau *eine* Methode am Testobjekt aufrufen.
 3. **Assert (Prüfen):** Das Ergebnis der Methode mit dem erwarteten Ergebnis vergleichen.
 
-## Code-Beispiel: Ein einfacher Test (Fact)
-Das `[Fact]` Attribut kennzeichnet einen simplen Testfall.
+## Der Unit Testing Lifecycle
+Ein Testlauf besteht aus:
+1. **Setup:** (Optional) Vorbereiten der Umgebung.
+2. **Execution:** Ausführen des Tests (AAA).
+3. **Teardown:** (Optional) Aufräumen (z.B. Dateien löschen).
+In xUnit wird für jeden Test eine neue Instanz der Testklasse erstellt, was für maximale Isolation sorgt.
+
+## xUnit Attribute: [Fact]
+Das `[Fact]` Attribut kennzeichnet einen invarianten Testfall – also eine Prüfung, die immer das gleiche Ergebnis liefern sollte, egal welche Daten vorliegen (innerhalb des Szenarios).
 
 ```csharp
 using Xunit;
@@ -66,21 +73,31 @@ public class SteuerIdValidatorTests
 }
 ```
 
-## Code-Beispiel: Parametrisierte Tests (Theory)
-Mit `[Theory]` und `[InlineData]` können wir denselben Test mit verschiedenen Datensätzen durchführen, um Randfälle (Edge Cases) abzuprüfen.
+## xUnit Attribute: [Theory]
+Mit `[Theory]` kennzeichnen wir parametrisierte Tests. Wir sagen: "Diese Logik gilt für eine ganze Reihe von Daten."
 
 ```csharp
     [Theory] 
     [InlineData("123")] // Zu kurz
     [InlineData("123456789012")] // Zu lang
-    [InlineData("ABC45678901")] // Enthält Buchstaben
-    public void Validieren_SollteFalseZurueckgeben_WennIdUngueltig(string id)
+    [InlineData("ABC45678901")] // Buchstaben
+    public void Validieren_SollteFalseZurueckgeben_WennIdUngueltigIst(string ungueltigeId)
     {
         var validator = new SteuerIdValidator();
-        bool result = validator.Validieren(id);
+        bool result = validator.Validieren(ungueltigeId);
         Assert.False(result);
     }
 ```
+
+## InlineData und alternative Quellen
+`[InlineData]` ist der einfachste Weg, Testdaten direkt im Code zu definieren. Für größere Datenmengen bietet xUnit auch `[MemberData]` oder `[ClassData]`, um Daten aus anderen Methoden oder Klassen zu laden.
+
+## Assertions: Mehr als nur True/False
+Die `Assert`-Klasse bietet viele hilfreiche Methoden:
+- `Assert.Equal(expected, actual)`
+- `Assert.Contains("Teiltext", resultString)`
+- `Assert.Throws<ArgumentException>(() => method())`
+- `Assert.Empty(collection)`
 
 ## Die Wichtigkeit der Namensgebung bei Tests
 Testnamen müssen nicht kurz sein. Sie sollten wie eine Dokumentation gelesen werden können.
@@ -92,24 +109,22 @@ Wenn der Test in der CI-Pipeline fehlschlägt, weiß der Entwickler anhand des N
 
 ## Die wichtigste Regel: Isolation
 Ein Unit Test muss *isoliert* ablaufen. 
-Er darf nicht auf das Dateisystem, nicht auf das Netzwerk und vor allem nicht auf eine echte Datenbank zugreifen!
-Warum? Weil der Test dann fehlschlägt, wenn das WLAN ausfällt – obwohl Ihr Code vielleicht völlig korrekt ist!
+Er darf nicht auf das Dateisystem, nicht auf das Netzwerk und vor allem nicht auf eine echte Datenbank zugreifen! Warum? Weil der Test sonst unzuverlässig (flaky) wird.
 
-## Das Problem: Fachlogik mit Infrastruktur
-Angenommen, wir testen einen `RegistrierungsService`, der eine echte E-Mail sendet und in die DB speichert.
-Jedes Mal, wenn wir die Test-Suite ausführen (hunderte Male am Tag), würden wir E-Mails versenden und Mülldaten in die DB schreiben. Das geht nicht!
+## Das Problem: Infrastruktur-Abhängigkeiten
+Stellen Sie sich vor, Sie wollen den `RegistrierungsService` testen. Dieser Service speichert Daten in einer echten Datenbank und sendet eine echte E-Mail.
+Problem: Wenn die Datenbank down ist, schlägt Ihr Test fehl, obwohl Ihr Code korrekt ist. Der Test ist langsam und hinterlässt "Müll" in der DB.
 
-## Die Lösung: Mocking (Attrappen)
-Wir erinnern uns an Woche 4 (Dependency Injection). Weil wir Interfaces nutzen, können wir für unsere Tests einfach Fake-Klassen (Mocks) erstellen, die das Interface bedienen, aber intern nichts Reales tun.
+## Die Lösung: Warum Interfaces?
+Weil wir gegen Interfaces programmieren, können wir die "echte" Datenbank im Test durch eine Attrappe (Mock) ersetzen. Ein Mock implementiert das Interface, tut aber nichts Kritisches.
 
-## Das Service-Beispiel (Code)
-Dieser Service soll getestet werden:
+## Der zu testende Service (Code)
+Dieser Service soll getestet werden. Er hängt von `IDatenbank` ab:
 
 ```csharp
 public class RegistrierungsService
 {
-    private readonly IDatenbank _db; // Wird via DI injiziert!
-    
+    private readonly IDatenbank _db;
     public RegistrierungsService(IDatenbank db) => _db = db;
 
     public void Registriere(Buerger b)
@@ -148,7 +163,7 @@ TDD dreht den klassischen Workflow um. Wir schreiben den Test *nicht* am Ende, w
 Wir schreiben den Test **zuerst**, bevor überhaupt eine einzige Zeile Fachcode existiert!
 
 ## Der Rote-Grün-Refactor Zyklus
-TDD ist ein iterativer Zyklus, der in drei strengen Phasen abläuft:
+TDD ist ein iterativer Zyklus, der in drei Phasen abläuft:
 1. **Red (Rot):** Einen fehlschlagenden Test schreiben.
 2. **Green (Grün):** Den minimal nötigen Code schreiben, um den Test grün zu machen.
 3. **Refactor (Aufräumen):** Den entstandenen Code elegant und sauber strukturieren.
@@ -170,24 +185,33 @@ Sie passen den Code an. Nach jeder kleinen Änderung lassen Sie die Tests laufen
 - **Lebende Dokumentation:** Die Tests beschreiben das Systemverhalten besser als jedes Word-Dokument.
 - **Besseres Design:** Wer TDD anwendet, baut automatisch entkoppelte, gut strukturierte Klassen (da sie sonst gar nicht vorab testbar wären).
 
-# Teil 5: Refactoring
+# Teil 5: Refactoring-Techniken
 
 ## Was ist Refactoring?
-Refactoring ist der Prozess, die interne Struktur von Code zu verbessern, ohne sein beobachtbares äußeres Verhalten zu verändern.
-Es ist das Aufräumen der "Küche", während wir das Menü (Software) zubereiten.
+Refactoring ist die Verbesserung der inneren Struktur ohne Änderung des äußeren Verhaltens. Es ist das Aufräumen des Codes, um ihn lesbar und wartbar zu halten.
 
-## Wann refaktorisieren wir?
-- Wenn Code "schlecht riecht" (Code Smells wie riesige Klassen, Duplicate Code).
-- Im TDD-Zyklus (Phase 3).
-- **Die goldene Regel:** Niemals refaktorisieren, wenn die Unit-Tests rot sind (oder fehlen!). Ohne Tests ist Refactoring blindes Raten.
+## Häufige Refactoring-Techniken
+1. **Extract Method:** Eine zu lange Methode in mehrere kleine aufteilen.
+2. **Rename Variable:** Unklare Namen (z.B. `x`) durch sprechende Namen (z.B. `antragsId`) ersetzen.
+3. **Move Method:** Eine Methode in die Klasse verschieben, zu der sie logisch gehört.
+4. **Remove Duplication:** Den "DRY" (Don't Repeat Yourself) Grundsatz anwenden.
+
+## Wann refaktorisieren?
+- Immer wenn der Code im "Green"-Zustand ist.
+- Wenn Sie eine neue Funktion hinzufügen wollen, aber der bestehende Code zu starr ist (Refactor first!).
+- Wenn Sie "Code Smells" entdecken.
+
+## Die goldene Regel des Refactorings
+**Niemals refaktorisieren, wenn die Unit-Tests rot sind!**
+Ohne ein grünes Sicherheitsnetz ist Refactoring extrem riskant und führt oft zu neuen Fehlern, die erst spät bemerkt werden.
 
 # Teil 6: Zusammenfassung
 
 ## Wrap-up Woche 5
-- **Automatisierte Tests** sind das Rückgrat der nachhaltigen Softwareentwicklung.
-- **xUnit & AAA:** Strukturierte Herangehensweise zur Überprüfung einzelner Methoden.
-- **Mocking:** Die Fähigkeit, I/O-Abhängigkeiten (DB, Netz) aus dem Test auszuklammern.
-- **TDD:** Die Methode, Tests als Design-Treiber (Red-Green-Refactor) einzusetzen.
+- **Unit Tests:** Sichern die Basis ab und dienen als lebendige Dokumentation.
+- **xUnit & AAA:** Ein strukturierter Standard für alle .NET Entwickler.
+- **Mocking:** Isoliert Logik von unzuverlässiger Infrastruktur.
+- **TDD:** Ein Workflow, der zu besserem Design und hoher Qualität führt.
 
 ## Ausblick auf nächste Woche
-In der finalen Theorie-Woche (Woche 6) betrachten wir asynchrone Programmierung (`async`/`await`) für moderne, vernetzte Fachverfahren und besprechen die Anforderungen an Ihre Abschlussprojekte!
+In der finalen Theorie-Woche (Woche 6) betrachten wir asynchrone Programmierung (`async`/`await`) und professionelles Error Handling. Zudem besprechen wir die Details zu Ihren Abschlussprojekten!

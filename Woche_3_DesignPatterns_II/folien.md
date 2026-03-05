@@ -26,26 +26,31 @@ Verwaltungsprozesse sind hochgradig regelbasiert und zustandsbehaftet.
 - **Regeln ändern sich:** Gebührensatzungen oder Gesetze werden modifiziert.
 - **Ereignisse passieren:** Ein Antragsteller muss benachrichtigt werden, wenn ein Dokument fehlt.
 - **Zustände wechseln:** Ein Bauantrag durchläuft Stufen von "Eingereicht" bis "Genehmigt".
-Für all diese Szenarien bieten Verhaltensmuster die perfekte Blaupause.
+
+## Fokus dieser Woche
+Wir konzentrieren uns auf drei essenzielle Muster:
+1. **Strategy:** Algorithmen austauschen (z.B. Steuerberechnungen).
+2. **Observer:** Systeme entkoppelt informieren (z.B. Status-Emails).
+3. **State:** Komplexe Workflows steuern (z.B. Antragsprozesse).
 
 # Teil 2: Das Strategy Pattern
 
 ## Einführung: Strategy Pattern
 Das Strategy-Pattern definiert eine Familie von Algorithmen, kapselt jeden einzelnen in einer eigenen Klasse und macht sie untereinander austauschbar. 
-Dadurch kann der Algorithmus unabhängig vom Klienten, der ihn nutzt, verändert werden.
+Dadurch kann der Algorithmus unabhängig vom Klienten verändert werden.
 
 ## Das Problem: Endlose If-Else-Ketten
-Haben Sie schon einmal Code gesehen, der so aussieht?
+Stellen Sie sich Code vor, der je nach Kommune eine andere Gebühr berechnet:
 ```csharp
 if (stadt == "Berlin") { berechneBerlinGebuehr(); }
 else if (stadt == "Muenchen") { berechneMuenchenGebuehr(); }
 else if (stadt == "Hamburg") { ... }
 ```
-Dieser Code verstößt gegen das Open-Closed-Prinzip. Bei jeder neuen Stadt muss die zentrale Berechnungs-Klasse modifiziert werden.
+Dieser Code verstößt gegen das **Open-Closed-Prinzip**. Bei jeder neuen Stadt muss die zentrale Berechnungs-Klasse modifiziert werden.
 
 ## Anwendung: Flexible Gebührenberechnung
-Stellen Sie sich ein landesweites System zur Berechnung von Hundesteuern vor. Jede Kommune hat ihre eigene Berechnungslogik (Satzung).
-Wir lagern diese spezifische Logik in einzelne Strategie-Klassen aus.
+In einem landesweiten System zur Berechnung von Hundesteuern hat jede Kommune ihre eigene Satzung.
+Wir lagern diese spezifische Logik in einzelne Strategie-Klassen aus, die alle dasselbe Interface bedienen.
 
 ## Strategy: Das Interface (Code)
 Wir definieren einen gemeinsamen "Vertrag" für alle Satzungen.
@@ -63,13 +68,17 @@ Egal wie komplex die interne Berechnung einer Stadt ist, nach außen gibt sie nu
 Jede Kommune bekommt ihre eigene Klasse.
 
 ```csharp
-// Konkrete Strategien (Satzungen)
+// Konkrete Strategie (Satzung Berlin)
 public class SatzungBerlin : IGebuehrenStrategie
 {
     public double Berechne(double basis) 
         => basis * 1.05; // 5% Verwaltungskostenzuschlag
 }
+```
 
+## Strategy: Konkrete Strategie München (Code)
+```csharp
+// Konkrete Strategie (Satzung München)
 public class SatzungMuenchen : IGebuehrenStrategie
 {
     public double Berechne(double basis) 
@@ -93,7 +102,7 @@ public class GebuehrenRechner
     public double BerechneEndbetrag(double basis)
     {
         if (_strategie == null) 
-            throw new InvalidOperationException("Keine Satzung!");
+            throw new InvalidOperationException("Keine Satzung gewählt!");
             
         return _strategie.Berechne(basis);
     }
@@ -196,7 +205,8 @@ public class EmailService : IStatusBeobachter
 # Teil 4: Das State Pattern
 
 ## Einführung: State Pattern
-Das State-Pattern erlaubt es einem Objekt, sein Verhalten grundlegend zu ändern, wenn sich sein interner Zustand ändert. Es kapselt zustandsspezifisches Verhalten in eigenen Klassen.
+Das State-Pattern erlaubt es einem Objekt, sein Verhalten grundlegend zu ändern, wenn sich sein interner Zustand ändert.
+Es kapselt zustandsspezifisches Verhalten in eigenen Klassen.
 
 ## Das Problem der Zustandsverwaltung
 Wie programmieren Sie einen Antrag, der verschiedene Phasen durchläuft? Meist endet es in unleserlichen Switch-Statements:
@@ -271,6 +281,11 @@ public class Bauantrag
 }
 ```
 
+## Unterschiede: State vs. Strategy
+Obwohl die Struktur ähnlich ist, ist die **Absicht** unterschiedlich:
+- **Strategy:** Der Client wählt den Algorithmus einmal aus (z.B. Berlin).
+- **State:** Das Objekt wechselt seinen "Algorithmus" (Zustand) selbstständig über die Zeit (Workflow).
+
 ## Vorteile des State Patterns
 - Wir eliminieren gewaltige bedingte Anweisungen (`if/switch`).
 - Das Hinzufügen eines neuen Zwischenschritts (z.B. `InWiderspruchsPruefung`) erfordert lediglich eine neue Klasse und eine Anpassung des Vorgängers.
@@ -287,6 +302,17 @@ public class Bauantrag
 In realen Anwendungen treten Muster selten isoliert auf.
 Ein `Bauantrag` (State) könnte eine `GebuehrenStrategie` (Strategy) nutzen, und bei jedem Zustandswechsel seine `IStatusBeobachter` (Observer) informieren.
 
+## Die 3 Takeaways für heute
+1. Strategy für austauschbare Regeln.
+2. Observer für entkoppelte Benachrichtigungen.
+3. State für saubere Workflows.
+
 ## Ausblick auf Woche 4
-Wir verlassen die Ebene der mikroskopischen Muster (Klassen) und betrachten in der nächsten Woche die makroskopische Ebene (Systeme): 
-Die **SOLID-Prinzipien** und die **Schichtenarchitektur (Layered Architecture)**.
+Nächste Woche verlassen wir die Ebene der Klassenmuster und betrachten die makroskopische Ebene: 
+Die **SOLID-Prinzipien** und die **Schichtenarchitektur**.
+
+## Übungsvorbereitung
+In der heutigen Übung werden wir ein Workflow-System für Parkausweise implementieren. Denken Sie daran: Erst den Prozess (Zustände) skizzieren, dann coden!
+
+## Vielen Dank!
+Gibt es noch Fragen zu den Verhaltensmustern?
