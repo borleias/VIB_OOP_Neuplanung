@@ -1,7 +1,7 @@
 ---
 title: "Objektorientierte Programmierung (Vertiefung)"
 subtitle: "Woche 5: Qualitätssicherung – Testing und Refactoring"
-author: "Dr. Peter Bernhardt"
+author: "Peter Bernhardt"
 date: "März 2026"
 section-titles: true
 ---

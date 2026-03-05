@@ -7,3 +7,8 @@ Erstelle einen Vorschlag für einen detailiierten Zeitplan für eine solche Vera
 
 
 lies die dateien für woche 1 erneut ein! arbeite die theorie für diese woche umfassend aus. sei sehr ausführlich und einführend. erstelle mindestens 30 folienvorschläge in der datei "folien.md". nutze dabei das pandoc format, um die markdown-dateien später in powerpoint-dateien umwandeln zu können.
+
+arbeite die projektaufgaben in woche 6 viel genauer aus. gib hinweise darauf, welche patterns wofür einzusetzen sind.
+
+erstelle ein zweite datei "einfachere_projektaufgaben.md" in der du jede der bisher erstellten projektaufgaben in einer deutlich vereinfachten form jeweils noch genauer erläuterst. gehe immer davon aus, dass die studierenden keine programmiererfahrung und nur zwei gute zwei wochen zeit haben! beschreibe insbesondere die fachlichen anforderungen sehr ausführlich. es sollen pro aufgabe nicht mehr als drei use cases sein!
+

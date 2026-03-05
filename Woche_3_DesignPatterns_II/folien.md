@@ -1,7 +1,7 @@
 ---
 title: "Objektorientierte Programmierung (Vertiefung)"
 subtitle: "Woche 3: Design Patterns II – Verhalten und Interaktion"
-author: "Dr. Peter Bernhardt"
+author: "Peter Bernhardt"
 date: "März 2026"
 section-titles: true
 ---

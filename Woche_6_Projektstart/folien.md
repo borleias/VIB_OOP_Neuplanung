@@ -1,7 +1,7 @@
 ---
 title: "Objektorientierte Programmierung (Vertiefung)"
 subtitle: "Woche 6: Fortgeschrittene Konzepte und Projektstart"
-author: "Dr. Peter Bernhardt"
+author: "Peter Bernhardt"
 date: "März 2026"
 section-titles: true
 ---
