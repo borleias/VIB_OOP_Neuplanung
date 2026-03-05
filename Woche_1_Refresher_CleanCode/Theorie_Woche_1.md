@@ -1,85 +1,115 @@
-# Woche 1: Refresher & Clean Code
+# Woche 1: Refresher & Clean Code – Vom Skript zum professionellen System
 
-In dieser Woche frischen wir Ihre C#-Kenntnisse auf und führen das Konzept des "Clean Code" ein. In der Verwaltungsinformatik ist Code oft langlebig und muss über Jahrzehnte von verschiedenen Personen gewartet werden. Daher ist die Lesbarkeit entscheidend.
+Herzlich willkommen zum Vertiefungsfach "Objektorientierte Programmierung". In dieser ersten Woche schlagen wir die Brücke zwischen dem bloßen "Schreiben von Code, der funktioniert" und dem "Entwickeln von Software, die wartbar ist".
 
-## 1. C# Refresher: Die Basics im Verwaltungskontext
+Gerade in der Verwaltungsinformatik begegnen uns Systeme, die über Jahrzehnte im Einsatz sind. Code, den Sie heute schreiben, wird vielleicht in 15 Jahren von einem Kollegen angepasst werden müssen, der Sie nie kennengelernt hat. **Clean Code** ist kein Luxus, sondern eine professionelle Notwendigkeit.
 
-Ein typisches Objekt in der Verwaltung ist ein `Buerger` oder ein `Antrag`.
+---
+
+## 1. Der Mindset-Shift: Prozedural vs. Objektorientiert
+
+Bisher haben Sie C# oft wie eine Abfolge von Befehlen genutzt (prozedural). In der OOP denken wir nicht in Schritten, sondern in **Verantwortlichkeiten** und **Objekten**.
+
+*   **Prozedural:** "Erst prüfe ich das Alter, dann berechne ich die Gebühr, dann drucke ich den Bescheid." (Fokus: Algorithmus)
+*   **Objektorientiert:** "Ein `Antrag` kennt seinen Status. Ein `Gebührenrechner` weiß, wie er einen `Antrag` bewertet. Ein `Bürger` besitzt Daten." (Fokus: Akteure und deren Interaktion)
+
+### Warum OOP?
+1.  **Kapselung:** Daten und die Logik, die diese Daten manipuliert, gehören zusammen.
+2.  **Wiederverwendbarkeit:** Ein gut designter `AdressValidator` kann in zehn verschiedenen Programmen genutzt werden.
+3.  **Wartbarkeit:** Änderungen an der Logik betreffen nur eine Stelle (die Klasse), nicht das gesamte Programm.
+
+---
+
+## 2. C# Refresher: Die Bausteine
+
+### 2.1 Klassen und Objekte
+Eine **Klasse** ist der Bauplan (z.B. "Antrag"), ein **Objekt** ist das konkrete Haus (z.B. "Der Bauantrag von Herrn Müller").
+
+### 2.2 Properties und Sichtbarkeit (Access Modifiers)
+Nutzen Sie `public`, `private`, `protected` und `internal` bewusst. **Geheimnisprinzip (Information Hiding):** Geben Sie nur das preis, was unbedingt nötig ist.
 
 ```csharp
-public class Buerger
+public class Antrag
 {
-    // Properties mit klaren Namen
-    public string Vorname { get; set; }
-    public string Nachname { get; set; }
-    public DateTime Geburtsdatum { get; set; }
-    public string SteuerId { get; private set; } // Nur intern setzbar
+    // Die ID darf von außen gelesen, aber nur intern gesetzt werden (Sicherheit!)
+    public string Id { get; private set; }
+    
+    // Properties kapseln Felder
+    public DateTime Eingangsdatum { get; set; }
 
-    public Buerger(string vorname, string nachname, string steuerId)
+    public Antrag(string id)
     {
-        Vorname = vorname;
-        Nachname = nachname;
-        SteuerId = steuerId;
-    }
-
-    public int BerechneAlter()
-    {
-        var heute = DateTime.Today;
-        var alter = heute.Year - Geburtsdatum.Year;
-        if (Geburtsdatum.Date > heute.AddYears(-alter)) alter--;
-        return alter;
+        Id = id;
+        Eingangsdatum = DateTime.Now;
     }
 }
 ```
 
-## 2. Clean Code Prinzipien
+### 2.3 Konstruktoren
+Ein Objekt sollte niemals in einem "ungültigen" Zustand existieren. Der Konstruktor stellt sicher, dass alle notwendigen Daten beim Erstellen vorhanden sind.
 
-## Warum Clean Code?
-- Code wird öfter gelesen als geschrieben.
-- "The only way to go fast, is to go well." (Robert C. Martin)
-- Reduktion technischer Schulden.
+---
 
-### Aussagekräftige Namen
-Vermeiden Sie Abkürzungen wie `a` oder `temp`. Nutzen Sie Fachbegriffe aus der Domäne (Verwaltung).
+## 3. Was ist Clean Code?
 
-- **Variablen:** `int d;` (Schlecht) vs. `int antragsEingangsDatum;` (Gut).
-- **Methoden:** `void DoIt();` (Schlecht) vs. `void SaveApplicationToDatabase();` (Gut).
-- **Klassen:** Nomen verwenden, keine Verben. `AccountProcessor` statt `ProcessAccount`.
+Der Begriff wurde maßgeblich von Robert C. Martin ("Uncle Bob") geprägt. Clean Code ist Code, der sich wie eine gut geschriebene Erzählung liest.
 
-## 3. Funktionen (Methoden)
-- **Kurz halten:** Eine Methode sollte idealerweise nicht mehr als 5-10 Zeilen haben.
-- **Eines tun (Do One Thing):** Eine Methode sollte eine einzige, klar definierte Aufgabe erfüllen.
-- **Keine Seiteneffekte:** Eine Methode `CheckPassword` sollte nicht gleichzeitig das Passwort in der Datenbank ändern.
+### 3.1 Die Kunst der Namensgebung
+Namen sind die wichtigste Dokumentation im Code.
 
-## 4. Single Responsibility (auf Methodenebene)
-Eine Methode sollte genau eine Sache tun. Wenn eine Methode `SpeichereUndSendeEmail` heißt, tut sie bereits zu viel.
+*   **Vermeiden Sie technisches Kauderwelsch:** `List<string> list1` sagt nichts aus. `List<string> registrierteBuerger` ist klar.
+*   **Keine Abkürzungen:** In der Verwaltung gibt es viele Abkürzungen (z.B. "VwVfG"). Im Code sollten wir jedoch ausschreiben: `Verwaltungsverfahrensgesetz`.
+*   **Sprechende Namen:** Eine Variable `d` für "Tage seit Eingang" ist ein Rätsel. `tageSeitAntragseingang` ist eine Antwort.
 
-## 5. DRY - Don't Repeat Yourself
-Wiederholen Sie keine Logik. Wenn Sie die Berechnung einer Gebühr an drei Stellen im Code haben, extrahieren Sie diese in eine eigene Methode.
+### 3.2 Funktionen (Methoden) – Die "Do One Thing"-Regel
+Eine Methode sollte genau **eine** Aufgabe haben.
 
-## 6. Magic Numbers und Strings vermeiden
-Nutzen Sie Konstanten oder Enums statt "magischer" Werte.
+*   **Länge:** Wenn eine Methode nicht auf einen Bildschirm passt, ist sie zu lang. Ziel: 5 bis 15 Zeilen.
+*   **Abstraktionsebene:** Mischen Sie nicht High-Level-Logik (z.B. "Prüfe Anspruch") mit Low-Level-Details (z.B. "Schreibe 'true' in SQL-Datenbank").
+*   **Argumente:** Je weniger, desto besser. Drei Argumente sind das Maximum, bevor es unübersichtlich wird. Nutzen Sie stattdessen Objekte als Parameter.
 
-*   **Schlecht:** `if (status == 1) { ... } // Was bedeutet 1?`
-*   **Gut:** `if (status == AntragsStatus.Eingegangen) { ... }`
+### 3.3 Keine Seiteneffekte (Side Effects)
+Eine Methode namens `IstBuergerVolljaehrig(Buerger b)` sollte nur `true` oder `false` zurückgeben. Sie sollte **nicht** heimlich das Geburtsdatum im Objekt ändern oder einen Log-Eintrag in die Datenbank schreiben.
 
-## 7. Kommentare
-- **Guter Code erklärt sich selbst:** Kommentare sollten nur dort eingesetzt werden, wo die Absicht des Codes nicht offensichtlich ist (z.B. komplexe Algorithmen oder externe API-Besonderheiten).
-- **Vermeiden:** Offensichtliche Kommentare wie `i++; // Erhöhe i um 1`.
-- **Vermeiden:** Auskommentierter Code. (Nutze Git!)
+---
 
-## 8. Formatierung
-- Konsistente Einrückung.
-- Zusammengehörige Codeabschnitte optisch gruppieren.
-- Befolgung der C# Coding Conventions (Microsoft).
+## 4. Anti-Patterns und wie man sie vermeidet
 
+### 4.1 Magic Numbers und Strings
+Zahlen wie `if (status == 4)` sind "magisch" und gefährlich. Was ist 4? Abgelehnt? In Bearbeitung?
+**Lösung:** Nutzen Sie `Enums`.
 
-## 9. Refactoring: Von Dirty zu Clean
+```csharp
+public enum AntragsStatus
+{
+    Eingereicht,
+    InPruefung,
+    Abgeschlossen,
+    Abgelehnt
+}
+// Viel besser:
+if (meinAntrag.Status == AntragsStatus.Abgelehnt) { ... }
+```
 
-Refactoring ist der Prozess, die Struktur von Code zu verbessern, ohne sein äußeres Verhalten zu ändern. 
+### 4.2 Kommentare als "Geruchs-Deo"
+Schreiben Sie keine Kommentare, um schlechten Code zu erklären. **Refaktorisieren Sie den Code stattdessen.**
+*   *Schlecht:* `// Prüft ob Bürger älter als 18 ist und in Berlin wohnt` -> gefolgt von komplexem If-Statement.
+*   *Gut:* `if (BuergerIstWahlberechtigt(buerger))` -> Die Methode erklärt sich selbst.
 
-**Typische Schritte:**
-1.  Klassen für Datenobjekte erstellen.
-2.  Logik aus der `Main`-Methode in spezialisierte Klassen auslagern.
-3.  Magische Werte durch Enums ersetzen.
-4.  Namen sprechend gestalten.
+---
+
+## 5. Refactoring-Workflow: Das "Dirty Library System"
+
+In der Übung dieser Woche nehmen wir ein "klassisches" Anfängerprogramm (Dirty) und überführen es in ein professionelles System (Clean).
+
+**Die Strategie:**
+1.  **Datenstrukturen identifizieren:** Aus `string[]` Arrays werden echte Klassen (`Buch`, `Nutzer`).
+2.  **Verantwortlichkeiten trennen:** Die `Main`-Methode steuert nur den Ablauf. Die Logik wandert in eine Klasse `BibliotheksVerwaltung`.
+3.  **Interfaces nutzen (Vorschau):** Wie könnten wir später eine Datenbank statt einer Liste anbinden?
+
+---
+
+## 6. Zusammenfassung der Goldenen Regeln
+1.  **DRY (Don't Repeat Yourself):** Kopieren Sie niemals Code.
+2.  **KISS (Keep It Simple, Stupid):** Wählen Sie die einfachste Lösung, nicht die "schlaueste".
+3.  **Boy Scout Rule:** Hinterlassen Sie den Code immer ein Stück sauberer, als Sie ihn vorgefunden haben.
