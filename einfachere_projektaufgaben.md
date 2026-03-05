@@ -1,119 +1,119 @@
 # Einfache Projektaufgaben (2-Wochen-Sprint)
+## Fokus: Fachdomäne und zielorientierte Use Cases
 
-Diese Aufgaben sind speziell für einen Bearbeitungszeitraum von **zwei Wochen** konzipiert. Sie konzentrieren sich auf die Kernlogik und eine saubere Struktur, ohne sich in technischen Details zu verlieren.
-
-**Wichtig:** Konzentriere dich auf die drei beschriebenen Anwendungsfälle. Nutze eine einfache Konsolenausgabe (Console.WriteLine).
-
----
-
-## 1. Mini-Wohngeldrechner
-*   **Szenario:** Ein Programm, das prüft, ob jemand Anspruch auf Wohngeld hat und wie hoch dieser (vereinfacht) ist.
-*   **Use Case 1:** Eingabe von Haushaltsgröße und Monatseinkommen.
-*   **Use Case 2:** Berechnung des Anspruchs: Wenn Einkommen unter 1500€ -> "Anspruch", sonst "Kein Anspruch".
-*   **Use Case 3:** Ausgabe eines einfachen "Bescheids" auf dem Bildschirm.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für zwei einfache Regeln: "Städtische Tabelle" vs. "Ländliche Tabelle" (unterschiedliche Grenzwerte).
-
-## 2. Einfache Kfz-Verwaltung
-*   **Szenario:** Ein System, um ein Auto anzumelden und ein Kennzeichen zu vergeben.
-*   **Use Case 1:** Erfassen eines Fahrzeugs (Marke, Kennzeichen-Wunsch).
-*   **Use Case 2:** Prüfung, ob das Kennzeichen noch frei ist (einfache Liste durchsuchen).
-*   **Use Case 3:** Status des Autos von "Abgemeldet" auf "Zugelassen" setzen.
-*   **Pattern-Tipp:** Nutze das **State Pattern** für die zwei Zustände: `Zugelassen` und `Abgemeldet`.
-
-## 3. Kita-Punkt-Prüfer
-*   **Szenario:** Ein Tool, das berechnet, wie viele Prioritäts-Punkte ein Kind für einen Kita-Platz erhält.
-*   **Use Case 1:** Eingabe von Daten: Alter des Kindes und "Beide Eltern berufstätig?" (Ja/Nein).
-*   **Use Case 2:** Punktevergabe: +5 Punkte für Berufstätigkeit, +2 Punkte wenn das Kind über 2 Jahre alt ist.
-*   **Use Case 3:** Anzeige der Gesamtpunktzahl und der Priorität (Hoch/Niedrig).
-*   **Pattern-Tipp:** Nutze eine **Factory**, um verschiedene "Antrags-Typen" zu erstellen (z.B. U3-Antrag oder Ü3-Antrag).
-
-## 4. Bürgeramt-Termin-Check
-*   **Szenario:** Ein kleiner Planer, der prüft, ob ein Termin für einen neuen Personalausweis frei ist.
-*   **Use Case 1:** Anzeigen von drei festen Terminslots (z.B. 08:00, 09:00, 10:00).
-*   **Use Case 2:** Einen Slot als "Gebucht" markieren.
-*   **Use Case 3:** Versuchen, einen bereits gebuchten Slot erneut zu buchen (Fehlermeldung ausgeben).
-*   **Pattern-Tipp:** Nutze das **Observer Pattern**, um eine Meldung auszugeben: "Kalender wurde aktualisiert!".
-
-## 5. Einfaches Fundbüro
-*   **Szenario:** Eine Liste von verlorenen Gegenständen verwalten.
-*   **Use Case 1:** Neuen Fundgegenstand eingeben (Name, Farbe).
-*   **Use Case 2:** Suche nach einem Begriff (z.B. "Schlüssel") in der Liste.
-*   **Use Case 3:** Einen Gegenstand als "Abgeholt" aus der Liste entfernen.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für die Suche: "Suche nach Name" oder "Suche nach Farbe".
-
-## 6. Bauantrag-Light
-*   **Szenario:** Verfolgung eines Bauantrags durch drei einfache Stufen.
-*   **Use Case 1:** Antrag anlegen (Bauherr, Vorhaben).
-*   **Use Case 2:** Den Antrag eine Stufe weiterbewegen (z.B. von "Eingereicht" zu "In Prüfung").
-*   **Use Case 3:** Den Antrag final auf "Genehmigt" setzen.
-*   **Pattern-Tipp:** Nutze das **State Pattern** für die Zustände: `Eingereicht`, `Pruefung`, `Genehmigt`.
-
-## 7. Hundesteuer-Rechner
-*   **Szenario:** Berechnung der jährlichen Steuer für einen Hund.
-*   **Use Case 1:** Hund erfassen (Name, Rasse).
-*   **Use Case 2:** Steuer berechnen: Normaler Hund = 100€, Gefährlicher Hund = 500€.
-*   **Use Case 3:** Anzeige des fälligen Betrags.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für die zwei Tarife: `NormalTarif` und `GefahrenTarif`.
-
-## 8. Wahlhelfer-Liste
-*   **Szenario:** Freiwillige für ein Wahllokal eintragen.
-*   **Use Case 1:** Person mit Name und Funktion (Beisitzer/Vorstand) registrieren.
-*   **Use Case 2:** Anzeige aller Personen, die für "Wahllokal A" eingetragen sind.
-*   **Use Case 3:** Prüfung: Sind mindestens 3 Personen eingetragen? (Ja/Nein).
-*   **Pattern-Tipp:** Nutze eine **Factory**, um Personen-Objekte mit der richtigen Funktion zu erstellen.
-
-## 9. Einfacher Mängelmelder
-*   **Szenario:** Bürger melden einen Mangel (z.B. "Schlagloch").
-*   **Use Case 1:** Mangel erfassen (Beschreibung, Ort).
-*   **Use Case 2:** Status ändern von "Offen" auf "In Arbeit".
-*   **Use Case 3:** Kurze Bestätigung an den Bürger ausgeben ("Wir kümmern uns!").
-*   **Pattern-Tipp:** Nutze das **Observer Pattern**, um eine Nachricht zu "versenden", wenn der Status sich ändert.
-
-## 10. Gewerbe-Check
-*   **Szenario:** Basis-Daten für eine Gewerbeanmeldung prüfen.
-*   **Use Case 1:** Name und Rechtsform (z.B. "Einzelunternehmen") eingeben.
-*   **Use Case 2:** Pflichtfeld-Check: Ist der Name länger als 3 Zeichen?
-*   **Use Case 3:** Bestätigung der Anmeldung ausgeben.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für die Prüfung: `CheckEinzelunternehmen` vs. `CheckGmbH`.
-
-## 11. Friedhof-Fristen-Check
-*   **Szenario:** Prüfen, ob eine Grabnutzung abläuft.
-*   **Use Case 1:** Grabnummer und Jahr der Bestattung eingeben.
-*   **Use Case 2:** Berechnung: Wenn (Aktuelles Jahr - Bestattungsjahr) > 20 -> "Ablauf".
-*   **Use Case 3:** Liste aller abgelaufenen Gräber anzeigen.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für: `Urnengrab` (15 Jahre) vs. `Erdgrab` (20 Jahre).
-
-## 12. Parkausweis-Prüfer
-*   **Szenario:** Darf ein Bürger einen Anwohnerparkausweis bekommen?
-*   **Use Case 1:** Abfrage: "Wohnhaft im Bezirk?" (Ja/Nein).
-*   **Use Case 2:** Abfrage: "Fahrzeuggewicht über 3.5 Tonnen?" (Ja/Nein).
-*   **Use Case 3:** Ergebnis: "Ausweis genehmigt" oder "Abgelehnt".
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für `PrivatPKW` vs. `LKW`.
-
-## 13. Schul-Platz-Verteiler
-*   **Szenario:** Ein Kind einer Schule zuweisen.
-*   **Use Case 1:** Name des Kindes und Wunsch-Schule eingeben.
-*   **Use Case 2:** Prüfen, ob in der Wunsch-Schule noch Plätze frei sind (einfacher Zähler).
-*   **Use Case 3:** Kind der Liste der Schule hinzufügen.
-*   **Pattern-Tipp:** Nutze das **Singleton Pattern** für die Verwaltung der Schul-Kapazitäten.
-
-## 14. Sperrmüll-Rechner
-*   **Szenario:** Kosten für die Sperrmüllabholung schätzen.
-*   **Use Case 1:** Anzahl der Möbelstücke eingeben.
-*   **Use Case 2:** Kosten berechnen: 5€ pro Stück, aber mindestens 20€ Grundgebühr.
-*   **Use Case 3:** Terminbestätigung ausgeben.
-*   **Pattern-Tipp:** Nutze das **Strategy Pattern** für `Privathaushalt` vs. `Gewerbe`.
-
-## 15. Kurs-Teilnehmer-Liste
-*   **Szenario:** Anwesenheit in einem Sprachkurs tracken.
-*   **Use Case 1:** Teilnehmer zur Liste hinzufügen.
-*   **Use Case 2:** Fehlstunden für einen Teilnehmer eintragen.
-*   **Use Case 3:** Warnung ausgeben, wenn Fehlstunden > 10.
-*   **Pattern-Tipp:** Nutze das **Observer Pattern**, um die Warnung automatisch auszulösen.
+Diese Projektsammlung richtet sich an Studierende der Verwaltungsinformatik im 3. Semester. Die Aufgaben sind so reduziert, dass sie in **zwei Wochen** umsetzbar sind. Der Fokus liegt nicht auf der Menge des Codes, sondern auf der **Abbildung fachlicher Logik in einer sauberen Objektstruktur**.
 
 ---
 
-## Tipps für den 2-Wochen-Sprint
-1.  **Halte es einfach:** Keine Datenbank, keine grafische Oberfläche. Nutze Listen (`List<T>`) im Speicher.
-2.  **Muster zuerst:** Überlege dir zuerst, wie du das Design Pattern einbaust, bevor du den Rest programmierst.
-3.  **Testen:** Schreib einen kleinen Test für die Berechnung (z.B. in der `Main`-Methode).
+## 1. Wohngeld-Prüfmodul
+**Fachdomäne:** Das Wohngeld ist eine Sozialleistung zur Sicherung angemessenen Wohnens. Die Verwaltung muss hierbei strikt nach gesetzlichen Tabellen prüfen, ob das Einkommen eines Haushalts im Verhältnis zur Miete und Personenzahl zu hoch ist. In dieser Domäne ist die **Rechtssicherheit** entscheidend: Jeder Bürger muss bei gleichen Voraussetzungen das gleiche Ergebnis erhalten.
+*   **Use Case 1 (Bürger):** Prüfen des individuellen Wohngeldanspruchs. (Ziel: Gewissheit über Förderfähigkeit erhalten).
+*   **Use Case 2 (Sachbearbeiter):** Festsetzen des monatlichen Wohngeldbetrages. (Ziel: Rechtsverbindliche Leistungsfeststellung).
+*   **Use Case 3 (System):** Ausgeben eines schriftlichen Bescheids. (Ziel: Erfüllung der Informationspflicht gegenüber dem Bürger).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** wird genutzt, um verschiedene Berechnungsvarianten (z.B. "Mietstufe I" vs. "Mietstufe VI") austauschbar zu machen, ohne den Rechenkern zu verändern.
+
+## 2. Kfz-Bestandsverwaltung
+**Fachdomäne:** Die Zulassungsbehörde führt das Fahrzeugregister. Dieses dient der Verkehrssicherheit und der Steuererhebung. Ein Fahrzeug durchläuft einen Lebenszyklus von der Erstzulassung bis zur Außerbetriebsetzung. Die Integrität des Registers ist von höchster Bedeutung für die Polizei und Versicherungen.
+*   **Use Case 1 (Bürger):** Anmelden eines Neufahrzeugs. (Ziel: Erhalt der Betriebserlaubnis für den öffentlichen Raum).
+*   **Use Case 2 (Sachbearbeiter):** Reservieren eines Wunschkennzeichens. (Ziel: Sicherstellung der Einmaligkeit einer Kennung).
+*   **Use Case 3 (Bürger):** Stilllegen eines Fahrzeugs. (Ziel: Beendigung der Steuer- und Versicherungspflicht).
+*   **Pattern-Einsatz:** Das **State Pattern** bildet den Lebenszyklus ab (Zugelassen, Abgemeldet). Bestimmte Aktionen (wie Kennzeichen-Wechsel) sind nur in bestimmten Zuständen erlaubt.
+
+## 3. Kita-Priorisierung
+**Fachdomäne:** Kita-Plätze sind eine knappe Ressource der kommunalen Daseinsvorsorge. Die Verteilung muss nach **objektiven Fairneß-Kriterien** erfolgen. Die Verwaltung muss hierbei soziale Faktoren (Berufstätigkeit, Alleinerziehend, Geschwisterkinder) gewichten, um Diskriminierung zu vermeiden und den Rechtsanspruch auf einen Betreuungsplatz zu erfüllen.
+*   **Use Case 1 (Eltern):** Einreichen einer Bedarfsanmeldung. (Ziel: Aufnahme in das Verteilungssystem).
+*   **Use Case 2 (Sachbearbeiter):** Ermitteln der Prioritäts-Punktzahl. (Ziel: Objektive Einstufung der Dringlichkeit).
+*   **Use Case 3 (Leitung):** Zuweisen eines freien Platzes. (Ziel: Optimale Auslastung der Kapazitäten).
+*   **Pattern-Einsatz:** Eine **Factory** erstellt verschiedene "Bewerber-Profile" (z.B. Krippenkind vs. Elementarkind), die unterschiedliche Grund-Prioritäten besitzen.
+
+## 4. Bürgeramt-Terminreservierung
+**Fachdomäne:** Moderne Verwaltung versteht sich als Dienstleister. Terminbuchungssysteme verhindern lange Wartezeiten und erlauben eine effiziente Personalplanung. Die Domäne befasst sich mit der Verwaltung von Zeit-Ressourcen und der Vermeidung von Doppelbuchungen.
+*   **Use Case 1 (Bürger):** Buchen eines freien Terminfensters. (Ziel: Sicherstellung einer persönlichen Beratung).
+*   **Use Case 2 (Sachbearbeiter):** Verwalten des täglichen Terminspiegels. (Ziel: Übersicht über das Arbeitsaufkommen).
+*   **Use Case 3 (System):** Stornieren eines Termins bei Nicht-Erscheinen. (Ziel: Wiederfreigabe der Ressource Zeit).
+*   **Pattern-Einsatz:** Das **Observer Pattern** informiert andere Module (z.B. das Statistik-Modul oder die Infotafel), wenn ein Termin gebucht oder storniert wurde.
+
+## 5. Fundbüro-Bestandsführung
+**Fachdomäne:** Das Fundrecht (§§ 965-984 BGB) regelt die Pflichten des Finders und der Behörde. Die Verwaltung muss Fundsachen sicher verwahren, dokumentieren und versuchen, den Eigentümer zu ermitteln. Nach Ablauf einer Frist (6 Monate) geht das Eigentum ggf. auf den Finder oder die Kommune über.
+*   **Use Case 1 (Finder):** Anzeigen eines Fundes. (Ziel: Erfüllung der gesetzlichen Meldepflicht).
+*   **Use Case 2 (Verlierer):** Suchen nach einem verlorenen Gegenstand. (Ziel: Wiedererlangung des Eigentums).
+*   **Use Case 3 (Sachbearbeiter):** Dokumentieren der Rückgabe. (Ziel: Rechtssicherer Abschluss des Fundvorgangs).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** erlaubt verschiedene Such-Strategien (z.B. "Exakter Abgleich der Seriennummer" vs. "Grobe Kategorien-Suche").
+
+## 6. Bauantrags-Statusverfolgung
+**Fachdomäne:** Das Baugenehmigungsverfahren stellt sicher, dass bauliche Anlagen den öffentlich-rechtlichen Vorschriften (Brandschutz, Statik) entsprechen. Es ist ein hoheitlicher Prozess mit klaren rechtlichen Stufen. Transparenz über den Bearbeitungsstand ist für Bauherren (Investitionssicherheit) essenziell.
+*   **Use Case 1 (Architekt):** Einreichen der Bauunterlagen. (Ziel: Start des Genehmigungsverfahrens).
+*   **Use Case 2 (Fachabteilung):** Dokumentieren eines Prüfungsschritts (z.B. Brandschutz). (Ziel: Fortschritt im Workflow).
+*   **Use Case 3 (Bauherr):** Einsehen des Genehmigungsstatus. (Ziel: Planungssicherheit für den Baustart).
+*   **Pattern-Einsatz:** Das **State Pattern** stellt sicher, dass ein Bescheid erst erstellt werden kann, wenn alle Prüf-Zustände (Brandschutz, Statik) positiv durchlaufen wurden.
+
+## 7. Hundesteuer-Veranlagung
+**Fachdomäne:** Die Hundesteuer ist eine örtliche Aufwandsteuer. Sie dient der Finanzierung kommunaler Aufgaben und der Lenkung (Eindämmung der Hundehaltung, insbesondere gefährlicher Rassen). Die Verwaltung muss hierbei unterschiedliche Steuersätze und Befreiungsgründe rechtssicher anwenden.
+*   **Use Case 1 (Halter):** Anmelden eines neuen Hundes. (Ziel: Erfüllung der steuerlichen Meldepflicht).
+*   **Use Case 2 (Sachbearbeiter):** Festsetzen der jährlichen Steuerlast. (Ziel: Erstellung der Einnahmenbasis).
+*   **Use Case 3 (Halter):** Beantragen einer Steuerbefreiung (z.B. für Assistenzhunde). (Ziel: Finanzielle Entlastung bei berechtigtem Interesse).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** kapselt die Steuertarife (Normal, Kampfhund, Befreit), sodass diese bei Satzungsänderungen leicht getauscht werden können.
+
+## 8. Wahlhelfer-Organisation
+**Fachdomäne:** Wahlen sind das Fundament der Demokratie. Die Organisation erfordert die Einteilung von Tausenden Freiwilligen in Wahllokale. Die Verwaltung muss sicherstellen, dass jedes Wahllokal gesetzlich korrekt besetzt ist (Wahlvorstand, Schriftführer, Beisitzer).
+*   **Use Case 1 (Bürger):** Melden zur ehrenamtlichen Wahlhilfe. (Ziel: Übernahme staatsbürgerlicher Verantwortung).
+*   **Use Case 2 (Wahlbehörde):** Einteilen des Wahlvorstands. (Ziel: Sicherstellung der Wahlrechts-Konformität).
+*   **Use Case 3 (Helfer):** Abrufen der Einsatzinformationen. (Ziel: Information über Ort und Zeit des Dienstes).
+*   **Pattern-Einsatz:** Eine **Factory** erzeugt die spezifischen Rollen-Objekte (Vorstand vs. Beisitzer), die unterschiedliche Befugnisse und Entschädigungssätze haben.
+
+## 9. Mängelmelder-System
+**Fachdomäne:** Kommunen haben eine Verkehrssicherungspflicht. Defekte Straßenlaternen oder Schlaglöcher müssen zeitnah behoben werden, um Haftungsansprüche zu vermeiden. Der Mängelmelder stärkt zudem die Bürgerbeteiligung und die Identifikation mit dem Wohnort.
+*   **Use Case 1 (Bürger):** Melden eines Infrastruktur-Mangels. (Ziel: Gefahrenabwehr und Verbesserung des Stadtbildes).
+*   **Use Case 2 (Bauhof):** Übernehmen einer Reparatur-Aufgabe. (Ziel: Planmäßige Behebung des Schadens).
+*   **Use Case 3 (Bürger):** Verfolgen der Mängelbehebung. (Ziel: Transparenz über das Verwaltungshandeln).
+*   **Pattern-Einsatz:** Das **Observer Pattern** benachrichtigt den Melder automatisch, sobald der Bauhof den Status auf "Behoben" setzt.
+
+## 10. Gewerberegister-Eintrag
+**Fachdomäne:** Die Gewerbeordnung verlangt eine Anzeige jeder gewerblichen Tätigkeit. Das Gewerberegister dient der Überwachung der Wirtschaft und der Information von Behörden (z.B. Finanzamt). Hierbei ist die korrekte Erfassung der Rechtsform und der Tätigkeit entscheidend.
+*   **Use Case 1 (Unternehmer):** Anzeigen einer Gewerbeeröffnung. (Ziel: Rechtmäßige Aufnahme der wirtschaftlichen Tätigkeit).
+*   **Use Case 2 (Gewerbeamt):** Prüfen der Anmeldung auf Plausibilität. (Ziel: Qualitätssicherung des Registers).
+*   **Use Case 3 (System):** Weiterleiten der Daten an das Finanzamt. (Ziel: Erfüllung der behördlichen Mitteilungspflicht).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** führt unterschiedliche Validierungen je nach Rechtsform aus (z.B. Prüfung des Handelsregistereintrags nur bei juristischen Personen).
+
+## 11. Friedhofs-Grabverwaltung
+**Fachdomäne:** Friedhöfe sind Orte der Trauer und der Kultur. Die Verwaltung muss Grabstätten über lange Zeiträume (20-30 Jahre) verwalten. Die Überwachung von Ruhefristen ist aus hygienischen und platzwirtschaftlichen Gründen zwingend erforderlich.
+*   **Use Case 1 (Angehöriger):** Erwerben eines Nutzungsrechts an einer Grabstätte. (Ziel: Vorsorge für einen Bestattungsfall).
+*   **Use Case 2 (Verwaltung):** Überwachen des Ablaufs der Ruhefrist. (Ziel: Geordnete Neubelegung von Flächen).
+*   **Use Case 3 (Angehöriger):** Verlängern der Grabnutzung. (Ziel: Erhalt der Gedenkstätte über die Mindestfrist hinaus).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** berechnet die Laufzeiten je nach Grabart (Urne vs. Sarg), da diese gesetzlich unterschiedlich geregelt sind.
+
+## 12. Parkausweis-Validierung
+**Fachdomäne:** Urbaner Parkraum ist begrenzt. Bewohnerparkausweise privilegieren Anwohner gegenüber Pendlern. Die Verwaltung muss hierbei den Wohnsitz und die Fahrzeughalterschaft prüfen, um Missbrauch zu verhindern und den Parkdruck für Bürger zu senken.
+*   **Use Case 1 (Anwohner):** Beantragen eines Bewohnerparkausweises. (Ziel: Erhalt einer Parkberechtigung im Wohnquartier).
+*   **Use Case 2 (Sachbearbeiter):** Validieren der Meldedaten. (Ziel: Sicherstellung der Anspruchsberechtigung).
+*   **Use Case 3 (Polizei/Ordnungsamt):** Prüfen der Gültigkeit eines Ausweises. (Ziel: Überwachung des ruhenden Verkehrs).
+*   **Pattern-Einsatz:** Der **Adapter** (angedeutet) könnte genutzt werden, um Daten aus dem externen Einwohnermelderegister in das Parksystem zu übersetzen.
+
+## 13. Schulplatz-Zuweisung
+**Fachdomäne:** Der Staat hat einen Bildungsauftrag. Die Zuweisung zu Grundschulen erfolgt meist nach Einzugsgebieten, bei weiterführenden Schulen nach Kapazität und pädagogischen Profilen. Die Verwaltung muss hierbei die Elternwünsche mit den vorhandenen Raumkapazitäten in Einklang bringen.
+*   **Use Case 1 (Eltern):** Anmelden eines schulpflichtigen Kindes. (Ziel: Erfüllung der Schulpflicht an einer Wunschschule).
+*   **Use Case 2 (Schulamt):** Prüfen der Kapazitätsgrenzen. (Ziel: Vermeidung von Klassen-Überfüllung).
+*   **Use Case 3 (Schulleitung):** Bestätigen der Aufnahme. (Ziel: Finalisierung der Klassenplanung).
+*   **Pattern-Einsatz:** Ein **Singleton** verwaltet die zentrale Kapazitätsliste aller Schulen, um sicherzustellen, dass kein Platz doppelt vergeben wird.
+
+## 14. Sperrmüll-Terminmanagement
+**Fachdomäne:** Die geordnete Abfallentsorgung gehört zur kommunalen Umweltschutzpflicht. Die Abholung von Sperrmüll muss logistisch geplant werden, um Fahrwege zu minimieren und die Entsorgungsanlagen gleichmäßig auszulasten.
+*   **Use Case 1 (Bürger):** Buchen eines Abholtermins. (Ziel: Entsorgung von sperrigen Haushaltsgegenständen).
+*   **Use Case 2 (Entsorgungsbetrieb):** Erstellen der Tages-Tourenliste. (Ziel: Logistische Optimierung der Abholung).
+*   **Use Case 3 (System):** Berechnen der anfallenden Gebühren. (Ziel: Kostendeckung der Entsorgungsleistung).
+*   **Pattern-Einsatz:** Das **Strategy Pattern** berechnet die Gebühren je nach Abfallmenge oder Haushaltsgröße.
+
+## 15. Integrationskurs-Tracking
+**Fachdomäne:** Integration ist eine gesamtgesellschaftliche Aufgabe. Sprachkurse sind hierbei der Schlüssel. Die Verwaltung (oft im Auftrag des BAMF) muss die Teilnahme überwachen, da die Förderung an die Anwesenheit gekoppelt ist. Die Domäne befasst sich mit Bildungsbiografien und staatlichen Fördermitteln.
+*   **Use Case 1 (Teilnehmer):** Dokumentieren der täglichen Anwesenheit. (Ziel: Sicherung des Förderanspruchs).
+*   **Use Case 2 (Kursleiter):** Bestätigen des erfolgreichen Kursabschlusses. (Ziel: Nachweis der Integrationsleistung).
+*   **Use Case 3 (Behörde):** Abrechnen der Kurskosten. (Ziel: Korrekte Verwendung von Steuermitteln).
+*   **Pattern-Einsatz:** Das **Observer Pattern** löst automatisch eine Meldung an die Ausländerbehörde aus, wenn ein Teilnehmer unentschuldigt fehlt (Verletzung der Mitwirkungspflicht).
+
+---
+
+## Umsetzungshinweise für Studierende
+1.  **Keine GUI:** Konzentriere dich auf die Logik. Nutze `Console.ReadLine()` für Eingaben und `Console.WriteLine()` für Ausgaben.
+2.  **Klassendesign:** Erstelle für jede fachliche Entität (z.B. `Buerger`, `Antrag`, `Hund`) eine eigene Klasse.
+3.  **Pattern-Fokus:** Das Design Pattern sollte den Kern deines Problems lösen (z.B. die Berechnung oder den Workflow).
+4.  **Zeitmanagement:** Nutze die erste Woche für das Design der Klassen und der Use Cases, die zweite Woche für die Implementierung und einen kleinen Unit-Test.
