@@ -18,14 +18,31 @@ namespace LibrarySystem
             b.Add(new string[] { "C# Profi", "Verfügbar" });
             b.Add(new string[] { "Python Skripte", "Ausgeliehen" });
 
-            // Ein Buch ausleihen
-            // wir leihen dem Peter das C# Profi Buch
+            // Peter leiht das C# Profi Buch aus - sollte klappen, da Peter aktiv ist und das Buch verfügbar ist
             if (u[0][1] == "1")
             {
                 if (b[0][1] == "Verfügbar")
                 {
                     b[0][1] = "Ausgeliehen";
                     Console.WriteLine("Buch erfolgreich ausgeliehen an " + u[0][0]);
+                }
+                else
+                {
+                    Console.WriteLine("Nicht verfügbar.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("User inaktiv.");
+            }
+
+            // Hans leiht das C# Profi Buch aus - sollte nicht klappen, da Hans inaktiv ist
+            if (u[1][1] == "1")
+            {
+                if (b[0][1] == "Verfügbar")
+                {
+                    b[0][1] = "Ausgeliehen";
+                    Console.WriteLine("Buch erfolgreich ausgeliehen an " + u[1][0]);
                 }
                 else
                 {

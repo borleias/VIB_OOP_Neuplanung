@@ -104,7 +104,7 @@ namespace CleanLibrarySystem
 
             // Aktion: Ausleihe
             bibliothek.LeiheBuchAus("Peter", "C# Profi");
-            bibliothek.LeiheBuchAus("Hans", "C# Profi"); // Sollte fehlschlagen
+            bibliothek.LeiheBuchAus("Hans", "C# Profi"); // Sollte fehlschlagen, da Hans inaktiv ist
 
             // Statusanzeige
             bibliothek.ZeigeStatus();
