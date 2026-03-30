@@ -127,3 +127,160 @@ namespace Woche_3_Loesung
         }
     }
 }
+
+// --- Aufgabe 4: State Pattern (Dokumentenworkflow) ---
+
+public interface IDokumentZustand
+{
+    string ZustandName { get; }
+    void Bearbeiten(DokumentWorkflow kontext);
+    void Einreichen(DokumentWorkflow kontext);
+    void Genehmigen(DokumentWorkflow kontext);
+    void Ablehnen(DokumentWorkflow kontext);
+}
+
+public class DokumentWorkflow
+{
+    public string Titel { get; }
+    public IDokumentZustand AktuellerZustand { get; private set; }
+
+    public DokumentWorkflow(string titel)
+    {
+        Titel = titel;
+        AktuellerZustand = new EntwurfZustand();
+    }
+
+    public void SetzeZustand(IDokumentZustand zustand)
+    {
+        AktuellerZustand = zustand;
+        Console.WriteLine($"Neuer Zustand: {AktuellerZustand.ZustandName}");
+    }
+
+    public void Bearbeiten() => AktuellerZustand.Bearbeiten(this);
+    public void Einreichen() => AktuellerZustand.Einreichen(this);
+    public void Genehmigen() => AktuellerZustand.Genehmigen(this);
+    public void Ablehnen() => AktuellerZustand.Ablehnen(this);
+}
+
+public class EntwurfZustand : IDokumentZustand
+{
+    public string ZustandName => "Entwurf";
+
+    public void Bearbeiten(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"'{kontext.Titel}' wird bearbeitet.");
+    }
+
+    public void Einreichen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"'{kontext.Titel}' wurde eingereicht.");
+        kontext.SetzeZustand(new InPruefungZustand());
+    }
+
+    public void Genehmigen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Ablehnen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+}
+
+public class InPruefungZustand : IDokumentZustand
+{
+    public string ZustandName => "InPruefung";
+
+    public void Bearbeiten(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Einreichen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Genehmigen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"'{kontext.Titel}' wurde genehmigt.");
+        kontext.SetzeZustand(new FreigegebenZustand());
+    }
+
+    public void Ablehnen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"'{kontext.Titel}' wurde abgelehnt.");
+        kontext.SetzeZustand(new AbgelehntZustand());
+    }
+}
+
+public class FreigegebenZustand : IDokumentZustand
+{
+    public string ZustandName => "Freigegeben";
+
+    public void Bearbeiten(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Einreichen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Genehmigen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Ablehnen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+}
+
+public class AbgelehntZustand : IDokumentZustand
+{
+    public string ZustandName => "Abgelehnt";
+
+    public void Bearbeiten(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"'{kontext.Titel}' wird ueberarbeitet und geht zurueck in den Entwurf.");
+        kontext.SetzeZustand(new EntwurfZustand());
+    }
+
+    public void Einreichen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Genehmigen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+
+    public void Ablehnen(DokumentWorkflow kontext)
+    {
+        Console.WriteLine($"Aktion nicht moeglich im Zustand {ZustandName}.");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var dokument = new DokumentWorkflow("Bauantrag Musterstrasse 123");
+        Console.WriteLine($"Startzustand: {dokument.AktuellerZustand.ZustandName}");
+
+        dokument.Genehmigen(); // Nicht erlaubt im Entwurf
+        dokument.Bearbeiten(); // Erlaubt
+        dokument.Einreichen(); // Entwurf -> InPruefung
+        dokument.Ablehnen();   // InPruefung -> Abgelehnt
+        dokument.Einreichen(); // Nicht erlaubt in Abgelehnt
+        dokument.Bearbeiten(); // Abgelehnt -> Entwurf
+        dokument.Einreichen(); // Entwurf -> InPruefung
+        dokument.Genehmigen(); // InPruefung -> Freigegeben
+        dokument.Bearbeiten(); // Nicht erlaubt in Freigegeben
+    }
+}
