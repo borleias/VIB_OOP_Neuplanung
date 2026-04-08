@@ -22,12 +22,13 @@ public class BescheidService {
 
 Dieser Code verletzt das **Single Responsibility Principle (SRP)** und ist schwer zu testen, da er direkt auf das Dateisystem und die Konsole zugreift (Verletzung des **Dependency Inversion Principle (DIP)**).
 
-1. **Refaktorisierung:** Trenne die Verantwortlichkeiten in eigene Klassen auf.
-    - `BescheidGenerator`: Erzeugt nur den Text.
+1. **Refaktorisierung:** Trennen Sie die Verantwortlichkeiten in eigene Klassen auf.
+    - `BescheidGenerator`: Erzeugt nur den Text (implementiert ein Interface `IBescheidGenerator`).
     - `FileStore`: Speichert den Text (implementiert ein Interface `IPersistence`).
     - `EmailNotifier`: Versendet die Benachrichtigung (implementiert ein Interface `INotifier`).
-2. **Dependency Injection:** Nutze Konstruktor-Injektion im `BescheidService`, um die Abhängigkeiten von außen zu übergeben.
-3. **Vorteil:** Überlege, wie du nun einen Test schreiben könntest, ohne tatsächlich eine Datei auf die Festplatte zu schreiben.
+
+2. **Dependency Injection:** Nutzen Sie Konstruktor-Injektion im `BescheidService`, um die Abhängigkeiten von außen zu übergeben. Sie können auf einen DI-Container verzichten und die Abhängigkeiten manuell im Hauptprogramm erstellen.
+3. **Testen:** Überlege, wie Sie nun einen Test schreiben könnten, ohne tatsächlich eine Datei auf die Festplatte zu schreiben.
 
 ## Aufgabe 2: Drei-Schichten-Architektur - Antragsverwaltung
 
@@ -49,19 +50,22 @@ Die Fachregeln lauten:
 ### Anforderungen
 
 1. Erstellen Sie ein Modell `Antrag` mit den Properties `AntragId`, `BuergerName`, `Kategorie`.
+
 2. Definieren Sie im Data Access Layer ein Interface `IAntragRepository` mit:
     - `void Speichern(Antrag antrag)`
-    - `Antrag? Laden(int antragId)`
-3. Implementieren Sie ein einfaches `InMemoryAntragRepository` (z.B. mit `Dictionary<int, Antrag>`). Kann ein Antrag nicht gefunden werden, soll `null` zurueckgegeben werden.
+    - `Antrag Laden(int antragId)`
+3. Implementieren Sie das Interface `IAntragRepository` mit einem einfachen `InMemoryAntragRepository` (z.B. mit `Dictionary<int, Antrag>` zum Speichern der Anträge). Kann ein Antrag nicht gefunden werden, soll `null` zurueckgegeben werden.
 4. Erstellen Sie im Business Layer eine Klasse `AntragService`, die das Repository per Konstruktor-Injektion erhaelt.
 5. Implementieren Sie im `AntragService` die Methode `void AntragEinreichen(Antrag antrag)` mit folgender Regel:
     - Wenn eine Fachregel des Antrages verletzt wird, wird eine `ArgumentException` geworfen.
     - Sonst wird der Antrag ueber das Repository gespeichert.
 6. Erstellen Sie im Presentation Layer eine Klasse `AntragController` mit Methoden:
-    - `void NeuerAntrag(int id, string name, string kategorie)`
+    - `void NeuerAntrag(int id, string name, string kategorie)`  
+     Diese Methode erstellt einen neuen Antrag und reicht ihn ein. Über das ERgebnis (Erfolg oder Fehler) wird eine Nachricht auf der Konsole ausgegeben.
     - `void ZeigeAntrag(int id)`
+        Diese Methode lädt einen Antrag und zeigt die Details auf der Konsole an. Wenn der Antrag nicht gefunden wird, soll eine entsprechende Nachricht ausgegeben werden.
 7. Der Controller soll nur mit dem Service arbeiten (Konstruktor-Injektion) und keinen direkten Repository-Zugriff haben.
-8. Testen Sie Ihre Implementierung.
+8. Testen Sie Ihre Implementierung mit einer Konsolenanwendung. Sie können auf Benutzerinteraktion verzichten und die Methoden direkt im `Main`-Programm aufrufen.
 
 ### Reflexionsfragen
 
