@@ -54,7 +54,7 @@ Die Fachregeln lauten:
 2. Definieren Sie im Data Access Layer ein Interface `IAntragRepository` mit:
     - `void Speichern(Antrag antrag)`
     - `Antrag Laden(int antragId)`
-3. Implementieren Sie das Interface `IAntragRepository` mit einem einfachen `InMemoryAntragRepository` (z.B. mit `Dictionary<int, Antrag>` zum Speichern der Anträge). Kann ein Antrag nicht gefunden werden, soll `null` zurueckgegeben werden.
+3. Implementieren Sie das Interface `IAntragRepository` mit einem einfachen `InMemoryAntragRepository` (z.B. mit `Dictionary<int, Antrag>` zum Speichern der Anträge). Ist bereits ein Antrag mit der gleichen Id vorhanden, soll dieser überschrieben werden. Kann ein Antrag nicht gefunden werden, soll `null` zurueckgegeben werden.
 4. Erstellen Sie im Business Layer eine Klasse `AntragService`, die das Repository per Konstruktor-Injektion erhaelt.
 5. Implementieren Sie im `AntragService` die Methode `void AntragEinreichen(Antrag antrag)` mit folgender Regel:
     - Wenn eine Fachregel des Antrages verletzt wird, wird eine `ArgumentException` geworfen.
