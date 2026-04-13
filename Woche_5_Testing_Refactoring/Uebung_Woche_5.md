@@ -36,7 +36,7 @@ Die Klasse soll das folgende Interface `IWarteschlangenManager` implementieren.
 ```csharp
 public interface IWarteschlangenManager
 {
-   public void TicketZiehen(string name);
+   public int TicketZiehen(string name);
    public string NaechstenAufrufen();
    public int AnzahlWartende();
 }
@@ -44,10 +44,11 @@ public interface IWarteschlangenManager
 
 ### Fachregeln
 
-1. Beim Ziehen eines Tickets darf `name` nicht leer oder nur aus Leerzeichen bestehen.
-2. `NaechstenAufrufen()` gibt den Namen der Person zurueck, die am laengsten wartet (FIFO).
-3. Wird `NaechstenAufrufen()` bei leerer Warteschlange aufgerufen, soll eine `InvalidOperationException` geworfen werden.
-4. `AnzahlWartende()` liefert die aktuelle Anzahl wartender Personen.
+1. Beim Ziehen eines Tickets darf `name` nicht leer oder nur aus Leerzeichen bestehen, sonst soll eine `ArgumentException` geworfen werden.
+2. `TicketZiehen(string name)` gibt die aktuelle Anzahl wartender Personen zurueck (inklusive der neu hinzugefuegten Person).
+3. `NaechstenAufrufen()` gibt den Namen der Person zurueck, die am laengsten wartet (FIFO).
+4. Wird `NaechstenAufrufen()` bei leerer Warteschlange aufgerufen, soll "niemand" zurückgegeben werden.
+5. `AnzahlWartende()` liefert die aktuelle Anzahl wartender Personen.
 
 ### Aufgabe
 
@@ -61,10 +62,11 @@ Arbeite in kleinen Schritten nach **Red -> Green -> Refactor**:
 
 ### Mindest-Testfaelle
 
-1. Ein Name wird hinzugefuegt, `AnzahlWartende()` steigt auf 1.
-2. Zwei Namen werden hinzugefuegt, Aufrufreihenfolge ist FIFO.
-3. `NaechstenAufrufen()` auf leerer Warteschlange wirft `InvalidOperationException`.
-4. Leerer oder whitespace-Name bei `TicketZiehen` wirft `ArgumentException`.
+1. Ein gültiger Name wird leerer Warteschlange hinzugefuegt, `TicketZiehen` gibt 1 zurueck.
+2. Ein gültiger Name wird hinzugefuegt, `AnzahlWartende()` erhöht sich um 1.
+3. Zwei Namen werden hinzugefuegt, Aufrufreihenfolge ist FIFO.
+4. `NaechstenAufrufen()` auf leerer Warteschlange gibt "niemand" zurück.
+5. Leerer oder whitespace-Name bei `TicketZiehen` wirft `ArgumentException`.
 
 ### Ziel
 
@@ -83,20 +85,21 @@ public class WarteschlangenManager
 {
    private readonly Queue<string> _wartende = new();
 
-   public void TicketZiehen(string name)
+   public int TicketZiehen(string name)
    {
       if (string.IsNullOrWhiteSpace(name))
       {
          throw new ArgumentException("Name darf nicht leer sein.", nameof(name));
       }
       _wartende.Enqueue(name);
+      return _wartende.Count;
    }
 
    public string NaechstenAufrufen()
    {
       if (_wartende.Count == 0)
       {
-         throw new InvalidOperationException("Keine wartenden Personen vorhanden.");
+         return "niemand";
       }
 
       return _wartende.Dequeue();
@@ -120,11 +123,11 @@ using Xunit;
 public class WarteschlangenManagerTddTests
 {
    [Fact]
-   public void Red_01_TicketZiehen_Erhoeht_AnzahlWartende()
+   public void Red_02_TicketZiehen_Erhoeht_AnzahlWartende()
    {
       var sut = new WarteschlangenManager();
-      sut.TicketZiehen("Anna");
-      Assert.Equal(1, sut.AnzahlWartende());
+      var ticketNumber = sut.TicketZiehen("Anna");
+      Assert.Equal(1, ticketNumber);
    }
 
    [Fact]
@@ -138,10 +141,10 @@ public class WarteschlangenManagerTddTests
    }
 
    [Fact]
-   public void Red_03_NaechstenAufrufen_Leer_WirftInvalidOperationException()
+   public void Red_03_NaechstenAufrufen_Leer_Gibt_Niemand_zurueck()
    {
       var sut = new WarteschlangenManager();
-      Assert.Throws<InvalidOperationException>(() => sut.NaechstenAufrufen());
+      Assert.Equal("niemand", sut.NaechstenAufrufen());
    }
 
    [Theory]
