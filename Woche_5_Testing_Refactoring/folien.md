@@ -151,6 +151,16 @@ Aber wie übergeben wir die Testdaten?
         bool result = validator.Validieren(ungueltigeId);
         Assert.False(result);
     }
+
+    [Theory] 
+    [InlineData(1, 1, 2)]
+    [InlineData(2, 2, 4)]
+    public void Addieren_GibtSummeZurueck_WennEingabenGueltigSind(int a, int b, int erwartet)
+    {
+        var addierer = new Addierer();
+        decimal ergebnis = addierer.Addieren(a, b);
+        Assert.Equal(erwartet, ergebnis);
+    }
 ```
 
 Für größere Datenmengen bietet xUnit auch `[MemberData]` oder `[ClassData]`, um Daten aus anderen Methoden oder Klassen zu laden.
