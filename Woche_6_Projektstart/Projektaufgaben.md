@@ -31,11 +31,12 @@ Ihr Projekt muss folgende Kriterien erfüllen:
 
 ## Vorstellung Ihrer Ergebnisse
 
-In der letzten Woche werden die Ergebnisse per Vorträge (jeweils 20 Min. zzgl. Q&A) vorgestellt.
+In der letzten Woche werden die Ergebnisse per Vortrag (jeweils 20 Min. zzgl. Q&A) vorgestellt.
 
-1. **Ihren Code souverän präsentieren:** Den roten Faden der Software-Struktur erläutern.
-2. **Architektur-Entscheidungen begründen:** Warum wurden bestimmte Design-Entscheidungen getroffen?
-3. **Kritisches Feedback geben und annehmen:** Peer-Review in der Gruppe durchführen.
+1. **Ihr Ergebnis praktisch vorstellen:** Die Funktionalität anhand eines von Ihnen vorbereiteten Beispiels demonstrieren.
+2. **Ihren Code souverän präsentieren:** Den roten Faden der Software-Struktur erläutern.
+3. **Architektur-Entscheidungen begründen:** Warum wurden bestimmte Design-Entscheidungen getroffen?
+4. **Kritisches Feedback geben und annehmen:** Peer-Review in der Gruppe durchführen.
 
 ## Bewertungskriterien
 
